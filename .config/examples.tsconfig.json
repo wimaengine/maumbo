@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    "strict": true,
+    "allowJs":true,
+    "checkJs":true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns":true,
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": "..",
+    "paths":{
+      "maumbo": [
+        "src/index.ts"
+      ],
+      "@examples/utils": [
+        "website/vendor/canvas2d.js"
+      ]
+    }
+  },
+  "include": ["../examples"]
+}
