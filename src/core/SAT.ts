@@ -52,9 +52,9 @@ export function SAT2d(
     contacts.map((contact) => {
       invTransform.transform(contact.pointB)
       contact.normalB = Affine2.transformWithoutTranslation(invTransform, contact.normalB)
-
-
-      // todo: transform tangent too
+      contact.tangentB = contact.tangentB
+        ? Affine2.transformWithoutTranslation(invTransform, contact.tangentB)
+        : Vector2.normal(contact.normalB)
       return contact
     })
   }
@@ -92,9 +92,9 @@ export function sat2dCircle(
     contacts.map((contact) => {
       invTransform.transform(contact.pointB)
       contact.normalB = Affine2.transformWithoutTranslation(invTransform, contact.normalB)
-
-
-      // todo: transform tangent too
+      contact.tangentB = contact.tangentB
+        ? Affine2.transformWithoutTranslation(invTransform, contact.tangentB)
+        : Vector2.normal(contact.normalB)
       return contact
     })
   }
@@ -120,7 +120,15 @@ export function sat2dCapsule(
     transform.x,
     transform.y
   )
-  const results = projectCapsuleVerticesToAxes(capsule, vertices, axes)
+  const closestAxis = getCapsuleClosestVertexAxis(capsule, vertices)
+
+  // Add the capsule's side normal (X-axis in local space) to the candidate axes
+  const capsuleAxes = [Vector2.X.clone()]
+  const allAxes = closestAxis
+    ? [...axes, closestAxis, ...capsuleAxes]
+    : [...axes, ...capsuleAxes]
+
+  const results = projectCapsuleVerticesToAxes(capsule, vertices, allAxes)
 
   if (!results) return undefined
 
@@ -131,7 +139,9 @@ export function sat2dCapsule(
     contacts.map((contact) => {
       invTransform.transform(contact.pointB)
       contact.normalB = Affine2.transformWithoutTranslation(invTransform, contact.normalB)
-
+      contact.tangentB = contact.tangentB
+        ? Affine2.transformWithoutTranslation(invTransform, contact.tangentB)
+        : Vector2.normal(contact.normalB)
       return contact
     })
   }
@@ -385,15 +395,61 @@ function projectCircleToAxis(circle: Circle, axis: Vector2): SATProjection {
  * @param {Vector2} axis
  */
 function projectCapsuleToAxis(capsule: Capsule, axis: Vector2): SATProjection {
-  const points = capsule.getVertices(axis)
-  const v1 = Vector2.dot(axis, points[0])
-  const v2 = Vector2.dot(axis, points[1])
+  const top = new Vector2(0, capsule.halfHeight)
+  const bottom = new Vector2(0, -capsule.halfHeight)
+  const p1 = Vector2.dot(axis, top)
+  const p2 = Vector2.dot(axis, bottom)
+  const radiusProjection = Vector2.magnitude(axis) * capsule.radius
 
-  if (v1 > v2) {
-    return new SATProjection(v2, v1)
+  return new SATProjection(
+    Math.min(p1, p2) - radiusProjection,
+    Math.max(p1, p2) + radiusProjection
+  )
+}
+
+/**
+ * @param {Capsule} capsule
+ * @param {Vector2[]} vertices
+ */
+function getCapsuleClosestVertexAxis(
+  capsule: Capsule,
+  vertices: Vector2[]
+): Vector2 | undefined {
+  const top = new Vector2(0, capsule.halfHeight)
+  const bottom = new Vector2(0, -capsule.halfHeight)
+  let axis: Vector2 | undefined
+  let minDistanceSq = Infinity
+
+  for (let i = 0; i < vertices.length; i++) {
+    const closest = closestPointOnSegment(vertices[i], bottom, top)
+    const delta = Vector2.subtract(vertices[i], closest)
+    const distanceSq = delta.magnitudeSquared()
+
+    if (distanceSq > 0 && distanceSq < minDistanceSq) {
+      minDistanceSq = distanceSq
+      axis = delta.normalize()
+    }
   }
 
-  return new SATProjection(v1, v2)
+  return axis
+}
+
+/**
+ * @param {Vector2} point
+ * @param {Vector2} a
+ * @param {Vector2} b
+ */
+function closestPointOnSegment(point: Vector2, a: Vector2, b: Vector2): Vector2 {
+  const ab = Vector2.subtract(b, a)
+  const abLengthSq = ab.magnitudeSquared()
+
+  if (abLengthSq === 0) {
+    return Vector2.copy(a)
+  }
+
+  const t = Math.max(0, Math.min(1, Vector2.dot(Vector2.subtract(point, a), ab) / abLengthSq))
+
+  return Vector2.add(a, Vector2.multiplyScalar(ab, t))
 }
 
 /**
