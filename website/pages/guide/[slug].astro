@@ -1,0 +1,34 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import { sidebarTabs } from "@configs";
+import DocLayout from "@layouts/DocLayout.astro";
+
+type Props = {
+  entry: CollectionEntry<"guide">;
+};
+
+export async function getStaticPaths() {
+  const entries = await getCollection("guide");
+
+  return entries.flatMap((entry: CollectionEntry<"guide">) => {
+    const raw = entry.slug ?? entry.id;
+    const cleaned = raw.replace(/\.md$/, "");
+
+    if (cleaned === "index") {
+      return [];
+    }
+
+    return [{
+      params: { slug: cleaned },
+      props: { entry }
+    }];
+  });
+}
+
+const { entry } = Astro.props as Props;
+const { Content } = await render(entry);
+---
+
+<DocLayout title={`${entry.data.title} | WebGLLIS`} tabs={sidebarTabs}>
+  <Content />
+</DocLayout>
