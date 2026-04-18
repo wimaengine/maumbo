@@ -6,8 +6,8 @@ export class Contact2D {
   normalA = new Vector2()
   normalB = new Vector2()
   depth = 0
-  tangentA?: Vector2
-  tangentB?: Vector2
+  tangentA = new Vector2()
+  tangentB = new Vector2()
 
   constructor(
     pointA: Vector2,
@@ -15,8 +15,8 @@ export class Contact2D {
     normalA: Vector2,
     normalB: Vector2,
     depth: number,
-    tangentA?: Vector2,
-    tangentB?: Vector2
+    tangentA: Vector2,
+    tangentB: Vector2
   ) {
     this.pointA = pointA
     this.pointB = pointB
@@ -28,7 +28,15 @@ export class Contact2D {
   }
 
   clone(): Contact2D {
-    return new Contact2D(this.pointA, this.pointB, this.normalA, this.normalB, this.depth)
+    return new Contact2D(
+      this.pointA,
+      this.pointB,
+      this.normalA,
+      this.normalB,
+      this.depth,
+      this.tangentA,
+      this.tangentB
+    )
   }
 
   transform(transformA: Affine2, transformB: Affine2): this {
@@ -36,8 +44,8 @@ export class Contact2D {
     transformB.transform(this.pointB)
     this.normalA = Affine2.transformWithoutTranslation(transformA, this.normalA)
     this.normalB = Affine2.transformWithoutTranslation(transformB, this.normalB)
-
-    // TODO: Transform tangents
+    this.tangentA = Affine2.transformWithoutTranslation(transformA, this.tangentA)
+    this.tangentB = Affine2.transformWithoutTranslation(transformB, this.tangentB)
     return this
   }
 

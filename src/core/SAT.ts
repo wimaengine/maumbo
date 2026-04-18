@@ -212,6 +212,7 @@ export function getContacts(
   return clip2.map((clip) => {
     const depth = refNorm.dot(clip) - max
     const distance = refNorm.clone().multiplyScalar(-depth)
+    const tangent = Vector2.normal(refNorm)
 
     if (flipped) {
       return new Contact2D(
@@ -219,7 +220,9 @@ export function getContacts(
         Vector2.copy(clip).add(distance),
         refNorm.clone(),
         refNorm.clone().reverse(),
-        depth
+        depth,
+        tangent.clone(),
+        tangent.clone()
       )
     }
 
@@ -228,7 +231,9 @@ export function getContacts(
       clip,
       refNorm.clone().reverse(),
       refNorm.clone(),
-      depth
+      depth,
+      tangent.clone(),
+      tangent.clone()
     )
   })
 }

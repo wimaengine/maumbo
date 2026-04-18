@@ -45,6 +45,8 @@ export function capsuleContacts(
       ? Vector2.divideScalar(delta, separation)
       : Vector2.Y.clone()
     const normalB = Affine2.transformWithoutTranslation(invTransform, normalA).reverse()
+    const tangentA = Vector2.normal(normalA)
+    const tangentB = Vector2.normal(normalB)
     const pointB = invTransform.transform(point.pointB)
 
     return new Contact2D(
@@ -52,7 +54,9 @@ export function capsuleContacts(
       Vector2.multiplyScalar(normalB, capsuleB.radius).add(pointB),
       normalA,
       normalB,
-      distance
+      distance,
+      tangentA,
+      tangentB
     )
     })
     .filter((e): e is Contact2D => e !== undefined)
@@ -101,13 +105,17 @@ export function capsuleCircleContact(
 
   const normalA = distance !== 0 ? Vector2.divideScalar(dist, distance) : Vector2.Y.clone()
   const normalB = Affine2.transformWithoutTranslation(invTransform, normalA).reverse()
+  const tangentA = Vector2.normal(normalA)
+  const tangentB = Vector2.normal(normalB)
 
   return new Contact2D(
     Vector2.multiplyScalar(normalA, capsule.radius).add(closest),
     Vector2.multiplyScalar(normalB, circle.radius),
     normalA,
     normalB,
-    penetration
+    penetration,
+    tangentA,
+    tangentB
   )
 }
 

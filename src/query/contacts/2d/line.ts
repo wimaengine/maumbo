@@ -75,6 +75,8 @@ export function linesContact(
   const normalA = Affine2
     .transformWithoutTranslation(transform, normalB)
     .reverse()
+  const tangentA = Vector2.normal(normalA)
+  const tangentB = Vector2.normal(normalB)
 
   const contactB = closestB
   const contactA = Vector2.add(
@@ -87,7 +89,9 @@ export function linesContact(
     contactB,
     normalA,
     normalB,
-    0
+    0,
+    tangentA,
+    tangentB
   )
 }
 
@@ -154,6 +158,8 @@ export function lineRectangleContact(
   const normalA = Affine2
     .transformWithoutTranslation(transform, normalB)
     .reverse()
+  const tangentA = Vector2.normal(normalA)
+  const tangentB = Vector2.normal(normalB)
   const contactA = Vector2.add(
     a0Local,
     Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), tMin)
@@ -166,7 +172,9 @@ export function lineRectangleContact(
     contactB,
     normalA,
     normalB,
-    penetration
+    penetration,
+    tangentA,
+    tangentB
   )
 }
 
@@ -223,6 +231,8 @@ export function lineTriangleContact(
   const normalA = Affine2
     .transformWithoutTranslation(transform, bestNormalB)
     .reverse()
+  const tangentA = Vector2.normal(normalA)
+  const tangentB = Vector2.normal(bestNormalB)
   const contactA = Vector2.add(
     a0Local,
     Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), bestT)
@@ -235,7 +245,9 @@ export function lineTriangleContact(
     contactB,
     normalA,
     bestNormalB,
-    penetration
+    penetration,
+    tangentA,
+    tangentB
   )
 }
 
@@ -328,6 +340,8 @@ export function lineCapsuleContact(
   const normalA = Affine2
     .transformWithoutTranslation(transform, normalB)
     .reverse()
+  const tangentA = Vector2.normal(normalA)
+  const tangentB = Vector2.normal(normalB)
   const contactA = Vector2.add(
     a0Local,
     Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), s)
@@ -338,7 +352,9 @@ export function lineCapsuleContact(
     contactB,
     normalA,
     normalB,
-    penetration
+    penetration,
+    tangentA,
+    tangentB
   )
 }
 
@@ -402,6 +418,8 @@ export function lineConvexPolygonContact(
   const normalA = Affine2
     .transformWithoutTranslation(transform, normalB)
     .reverse()
+  const tangentA = Vector2.normal(normalA)
+  const tangentB = Vector2.normal(normalB)
 
   const contactA = Vector2.add(
     a0Local,
@@ -415,6 +433,8 @@ export function lineConvexPolygonContact(
     contactB,
     normalA,
     normalB,
-    penetration
+    penetration,
+    tangentA,
+    tangentB
   )
 }
