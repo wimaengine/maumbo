@@ -1,4 +1,5 @@
 export * from './SAT'
 export * from './contact'
+export * from './gjkEPA'
 export * from './intersection'
 export * from './closepoints'
