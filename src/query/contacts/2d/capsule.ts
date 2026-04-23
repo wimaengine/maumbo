@@ -1,4 +1,8 @@
-import { Contact2D, sat2dCapsule } from '../../../core'
+import {
+  Contact2D,
+  sat2dCapsule,
+  GJKandEPA
+} from '../../../core'
 import { Capsule, Circle, ConvexPolygon, Rectangle, Triangle } from '../../../shapes'
 import { Vector2, clamp, Affine2 } from 'hisabati'
 import {
@@ -130,24 +134,37 @@ export function capsuleRectangleContact(
   b: Rectangle,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof sat2dCapsule> {
+): Contact2D[] | undefined {
   const points = b.getPoints().map((e: Vector2) => transform.transform(e.clone()))
-  const nearestIndex = getNearVertex(Vector2.Zero, points)
-  const axis = Vector2.copy(points[nearestIndex])
-  const length = axis.magnitudeSquared()
+  const contacts = GJKandEPA(
+    (direction: Vector2) => createCapsuleSupportPoint(a, direction),
+    (direction: Vector2) => a.getFeature(direction),
+    (direction: Vector2) => createShapeSupportPoint(b.getSupportPoint(direction, transform)),
+    (direction: Vector2) => b.getFeature(direction, transform),
+    transform,
+    invTransform
+  )
+  const fallbackContacts = sat2dCapsule(
+    a,
+    points,
+    [
+      getCapsuleFallbackAxis(points, transform),
+      Vector2.normal(Vector2.subtract(points[0], points[1])).normalize(),
+      Vector2.normal(Vector2.subtract(points[1], points[2])).normalize()
+    ],
+    transform,
+    invTransform
+  )
 
-  if (length === 0) {
-    axis.set(transform.x, transform.y)
+  if (!contacts) {
+    return fallbackContacts
   }
 
-  axis.normalize()
-  const axes = [
-    axis,
-    Vector2.normal(Vector2.subtract(points[0], points[1])).normalize(),
-    Vector2.normal(Vector2.subtract(points[1], points[2])).normalize()
-  ]
+  if (fallbackContacts && fallbackContacts.length > contacts.length) {
+    return fallbackContacts
+  }
 
-  return sat2dCapsule(a, points, axes, transform, invTransform)
+  return contacts
 }
 
 /**
@@ -161,25 +178,38 @@ export function capsuleTriangleContact(
   b: Triangle,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof sat2dCapsule> {
+): Contact2D[] | undefined {
   const points = b.getPoints().map((e: Vector2) => transform.transform(e.clone()))
-  const nearestIndex = getNearVertex(Vector2.Zero, points)
-  const axis = Vector2.copy(points[nearestIndex])
-  const length = axis.magnitudeSquared()
+  const contacts = GJKandEPA(
+    (direction: Vector2) => createCapsuleSupportPoint(a, direction),
+    (direction: Vector2) => a.getFeature(direction),
+    (direction: Vector2) => createShapeSupportPoint(b.getSupportPoint(direction, transform)),
+    (direction: Vector2) => b.getFeature(direction, transform),
+    transform,
+    invTransform
+  )
+  const fallbackContacts = sat2dCapsule(
+    a,
+    points,
+    [
+      getCapsuleFallbackAxis(points, transform),
+      Vector2.normal(Vector2.subtract(points[0], points[1])).normalize(),
+      Vector2.normal(Vector2.subtract(points[1], points[2])).normalize(),
+      Vector2.normal(Vector2.subtract(points[2], points[0])).normalize()
+    ],
+    transform,
+    invTransform
+  )
 
-  if (length === 0) {
-    axis.set(transform.x, transform.y)
+  if (!contacts) {
+    return fallbackContacts
   }
 
-  axis.normalize()
-  const axes = [
-    axis,
-    Vector2.normal(Vector2.subtract(points[0], points[1])).normalize(),
-    Vector2.normal(Vector2.subtract(points[1], points[2])).normalize(),
-    Vector2.normal(Vector2.subtract(points[2], points[0])).normalize()
-  ]
+  if (fallbackContacts && fallbackContacts.length > contacts.length) {
+    return fallbackContacts
+  }
 
-  return sat2dCapsule(a, points, axes, transform, invTransform)
+  return contacts
 }
 
 /**
@@ -193,21 +223,91 @@ export function capsuleConvexPolygonContact(
   b: ConvexPolygon,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof sat2dCapsule> {
+): Contact2D[] | undefined {
   const points = b.points.map((e: Vector2) => transform.transform(e.clone()))
+  const contacts = GJKandEPA(
+    (direction: Vector2) => createCapsuleSupportPoint(a, direction),
+    (direction: Vector2) => a.getFeature(direction),
+    (direction: Vector2) => createShapeSupportPoint(b.getSupportPoint(direction, transform)),
+    (direction: Vector2) => b.getFeature(direction, transform),
+    transform,
+    invTransform
+  )
+  const fallbackContacts = sat2dCapsule(
+    a,
+    points,
+    getCapsuleFallbackAxes(points, transform),
+    transform,
+    invTransform
+  )
+
+  if (!contacts) {
+    return fallbackContacts
+  }
+
+  if (fallbackContacts && fallbackContacts.length > contacts.length) {
+    return fallbackContacts
+  }
+
+  return contacts
+}
+
+function createCapsuleSupportPoint(capsule: Capsule, direction: Vector2) {
+  const pointA = capsule.getSupportPoint(direction)
+
+  return {
+    point: pointA.clone(),
+    pointA,
+    pointB: new Vector2()
+  }
+}
+
+function createShapeSupportPoint(pointB: Vector2) {
+  return {
+    point: pointB.clone(),
+    pointA: new Vector2(),
+    pointB
+  }
+}
+
+function getCapsuleFallbackAxis(points: Vector2[], transform: Affine2): Vector2 {
   const nearestIndex = getNearVertex(Vector2.Zero, points)
   const axis = Vector2.copy(points[nearestIndex])
-  const length = axis.magnitudeSquared()
 
-  if (length === 0) {
+  if (axis.magnitudeSquared() === 0) {
     axis.set(transform.x, transform.y)
   }
 
-  axis.normalize()
-  const axes = [
-    axis,
-    ...b.normals.map((e: Vector2) => Affine2.transformWithoutTranslation(transform, e))
-  ]
+  return axis.normalize()
+}
 
-  return sat2dCapsule(a, points, axes, transform, invTransform)
+function getCapsuleFallbackAxes(points: Vector2[], transform: Affine2): Vector2[] {
+  const axes = [getCapsuleFallbackAxis(points, transform)]
+  const unique: Vector2[] = []
+
+  for (let i = 0; i < points.length; i++) {
+    const current = points[i]
+    const next = points[(i + 1) % points.length]
+    const edge = Vector2.subtract(current, next)
+
+    if (edge.magnitudeSquared() === 0) {
+      continue
+    }
+
+    const normal = Vector2.normal(edge).normalize()
+    const duplicate = unique.some((candidate) => {
+      return (
+        Vector2.distanceToSquared(candidate, normal) <= 1e-12 ||
+        Vector2.distanceToSquared(candidate, normal.clone().reverse()) <= 1e-12
+      )
+    })
+
+    if (!duplicate) {
+      unique.push(normal)
+    }
+  }
+
+  axes.push(...unique)
+
+  return axes
 }
