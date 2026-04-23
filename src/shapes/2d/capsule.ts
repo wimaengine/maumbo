@@ -1,4 +1,5 @@
 import { Vector2 } from 'hisabati'
+import type { Feature } from '../../core/gjkEPA.js'
 
 export class Capsule {
   radius = 0
@@ -27,6 +28,43 @@ export class Capsule {
       Vector2.add(bottom, Vector2.multiplyScalar(normal, this.radius)),
       Vector2.add(top, Vector2.multiplyScalar(normal, -this.radius))
     ]
+  }
+
+  getSupportPoint(direction: Vector2): Vector2 {
+    const axis = direction.magnitudeSquared() === 0
+      ? Vector2.X.clone()
+      : direction.clone().normalize()
+    const center = axis.y >= 0
+      ? new Vector2(0, this.halfHeight)
+      : new Vector2(0, -this.halfHeight)
+
+    return Vector2.multiplyScalar(axis, this.radius).add(center)
+  }
+
+  getFeature(direction: Vector2): Feature {
+    if (Math.abs(direction.x) >= Math.abs(direction.y)) {
+      const side = Math.sign(direction.x) || 1
+
+      return {
+        type: 'edge',
+        v1: new Vector2(side * this.radius, -this.halfHeight),
+        v2: new Vector2(side * this.radius, this.halfHeight),
+        normal: new Vector2(side, 0)
+      }
+    }
+
+    const axis = direction.magnitudeSquared() === 0
+      ? Vector2.Y.clone()
+      : direction.clone().normalize()
+    const center = axis.y >= 0
+      ? new Vector2(0, this.halfHeight)
+      : new Vector2(0, -this.halfHeight)
+
+    return {
+      type: 'point',
+      point: Vector2.multiplyScalar(axis, this.radius).add(center),
+      normal: axis
+    }
   }
 
   getPoints(resolution = 16): Vector2[] {

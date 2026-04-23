@@ -1,5 +1,7 @@
 import { Shape2 } from './shape2.js'
-import { Vector2, fuzzyEqual } from 'hisabati'
+import { Affine2, Vector2, fuzzyEqual } from 'hisabati'
+import type { Feature } from '../../core/gjkEPA.js'
+import { getPolygonFeature } from './utils.js'
 
 export class ConvexPolygon extends Shape2 {
   points: Vector2[] = []
@@ -13,6 +15,35 @@ export class ConvexPolygon extends Shape2 {
 
   getPoints(): Vector2[] {
     return this.points
+  }
+
+  getSupportPoint(direction: Vector2, transform?: Affine2): Vector2 {
+    let maxDot = -Infinity
+    let support = transform
+      ? transform.transform(this.points[0].clone())
+      : this.points[0].clone()
+
+    for (let i = 0; i < this.points.length; i++) {
+      const point = transform
+        ? transform.transform(this.points[i].clone())
+        : this.points[i]
+      const projection = Vector2.dot(point, direction)
+
+      if (projection > maxDot) {
+        maxDot = projection
+        support = point
+      }
+    }
+
+    return support.clone()
+  }
+
+  getFeature(direction: Vector2, transform?: Affine2): Feature {
+    const vertices = transform
+      ? this.points.map((point) => transform.transform(point.clone()))
+      : this.points.map((point) => point.clone())
+
+    return getPolygonFeature(vertices, direction)
   }
 
   static fromPoints(points: Vector2[]): ConvexPolygon {
