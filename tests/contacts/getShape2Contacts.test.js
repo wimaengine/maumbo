@@ -2,9 +2,11 @@ import test from "node:test"
 import { ok, strictEqual } from "node:assert"
 import { Affine2, fuzzyEqual } from "hisabati"
 import {
+  Capsule,
   Circle,
   Line2,
   Rectangle,
+  capsuleRectangleContact,
   circleContact,
   circleRectangleContacts,
   getShape2Contacts,
@@ -77,4 +79,32 @@ test("getShape2Contacts: flips circle-line to lineCircleContact", () => {
   strictEqual(fuzzyEqual(contacts[0].pointB.x, flipped.pointB.x, 1e-12), true)
   strictEqual(fuzzyEqual(contacts[0].pointB.y, flipped.pointB.y, 1e-12), true)
   strictEqual(fuzzyEqual(contacts[0].depth, flipped.depth, 1e-12), true)
+})
+
+test("getShape2Contacts: flips rectangle-capsule to capsuleRectangleContact", () => {
+  const capsule = new Capsule(1, 2)
+  const rectangle = new Rectangle(1, 1)
+
+  const capsuleT = Affine2.identity()
+  const rectangleT = Affine2.identity()
+  rectangleT.x = 1.5
+
+  const contacts = getShape2Contacts(rectangle, capsule, rectangleT, capsuleT)
+  strictEqual(Array.isArray(contacts), true)
+  strictEqual(contacts.length > 0, true)
+
+  const transform = Affine2.invert(capsuleT).multiply(rectangleT)
+  const invTransform = Affine2.invert(transform)
+  const direct = capsuleRectangleContact(capsule, rectangle, transform, invTransform)
+  strictEqual(Array.isArray(direct), true)
+  strictEqual(direct.length, contacts.length)
+
+  for (let i = 0; i < direct.length; i++) {
+    const flipped = direct[i].clone().flip()
+    strictEqual(fuzzyEqual(contacts[i].pointA.x, flipped.pointA.x, 1e-8), true)
+    strictEqual(fuzzyEqual(contacts[i].pointA.y, flipped.pointA.y, 1e-8), true)
+    strictEqual(fuzzyEqual(contacts[i].pointB.x, flipped.pointB.x, 1e-8), true)
+    strictEqual(fuzzyEqual(contacts[i].pointB.y, flipped.pointB.y, 1e-8), true)
+    strictEqual(fuzzyEqual(contacts[i].depth, flipped.depth, 1e-8), true)
+  }
 })

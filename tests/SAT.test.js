@@ -34,6 +34,8 @@ describe("Testing SAT contact point generation", (suite)=>{
         new Vector2(-0, -1),
         new Vector2(0, 1),
         1,
+        new Vector2(1, -0),
+        new Vector2(1, -0)
       )])
   })
   test("Contact on two points case 1", () => {
@@ -66,6 +68,8 @@ describe("Testing SAT contact point generation", (suite)=>{
         new Vector2(0, -1),
         new Vector2(-0, 1),
         1,
+        new Vector2(-1, -0),
+        new Vector2(-1, 0)
       ),
       new Contact2D(
         new Vector2(8, 4),
@@ -73,6 +77,8 @@ describe("Testing SAT contact point generation", (suite)=>{
         new Vector2(0, -1),
         new Vector2(-0, 1),
         1,
+        new Vector2(-1, -0),
+        new Vector2(-1, 0)
       )
     ])
   })
@@ -117,5 +123,3 @@ describe("Testing SAT contact point generation", (suite)=>{
     strictEqual(contacts[1].depth, 1.0307764064044154)
   })
 })
-
-
