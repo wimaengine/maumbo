@@ -438,9 +438,11 @@ export class Gizmo3D {
 
 export class Canvas2D {
   constructor() {
+    this.container = document.createElement('div')
     this.canvas = document.createElement('canvas')
     this.context = this.canvas.getContext('2d')
     this.gizmo = new Gizmo2D()
+    this.playPauseButton = document.createElement('button')
 
     if (!this.context) {
       throw new Error('Canvas 2D context is not available.')
@@ -451,6 +453,9 @@ export class Canvas2D {
     this.pixelRatio = 1
     this.draws = []
     this.rafId = 0
+    this.sceneTime = 0
+    this.lastFrameTime = null
+    this.paused = false
     this.camera = new Vector2()
     this.zoom = 1
     this.minZoom = 0.25
@@ -462,12 +467,34 @@ export class Canvas2D {
     this.lastPinchDistance = 0
     this.lastPinchCenter = new Vector2()
 
+    this.container.style.position = 'relative'
+    this.container.style.width = '100vw'
+    this.container.style.height = '100vh'
     this.canvas.style.display = 'block'
     this.canvas.style.width = '100vw'
     this.canvas.style.height = '100vh'
     this.canvas.style.touchAction = 'none'
     this.canvas.style.cursor = 'grab'
-    document.body.appendChild(this.canvas)
+    this.playPauseButton.type = 'button'
+    this.playPauseButton.textContent = 'Pause'
+    this.playPauseButton.setAttribute('aria-pressed', 'false')
+    this.playPauseButton.style.position = 'fixed'
+    this.playPauseButton.style.top = '16px'
+    this.playPauseButton.style.left = '0%'
+    this.playPauseButton.style.transform = 'translateX(50%)'
+    this.playPauseButton.style.zIndex = '10'
+    this.playPauseButton.style.padding = '8px 14px'
+    this.playPauseButton.style.border = '1px solid rgba(255, 255, 255, 0.24)'
+    this.playPauseButton.style.borderRadius = '999px'
+    this.playPauseButton.style.background = 'rgba(0, 0, 0, 0.72)'
+    this.playPauseButton.style.color = '#ffffff'
+    this.playPauseButton.style.font = '600 14px system-ui, sans-serif'
+    this.playPauseButton.style.cursor = 'pointer'
+    this.playPauseButton.style.backdropFilter = 'blur(10px)'
+    this.playPauseButton.style.webkitBackdropFilter = 'blur(10px)'
+    this.container.appendChild(this.canvas)
+    this.container.appendChild(this.playPauseButton)
+    document.body.appendChild(this.container)
 
     this.handleResize = this.handleResize.bind(this)
     this.handlePointerDown = this.handlePointerDown.bind(this)
@@ -475,11 +502,13 @@ export class Canvas2D {
     this.handlePointerUp = this.handlePointerUp.bind(this)
     this.handleLostPointerCapture = this.handleLostPointerCapture.bind(this)
     this.handleWheel = this.handleWheel.bind(this)
+    this.handleTogglePause = this.handleTogglePause.bind(this)
     this.loop = this.loop.bind(this)
 
     window.addEventListener('resize', this.handleResize)
     this.canvas.addEventListener('pointerdown', this.handlePointerDown)
     this.canvas.addEventListener('wheel', this.handleWheel, { passive: false })
+    this.playPauseButton.addEventListener('click', this.handleTogglePause)
     window.addEventListener('pointermove', this.handlePointerMove)
     window.addEventListener('pointerup', this.handlePointerUp)
     window.addEventListener('pointercancel', this.handlePointerUp)
@@ -502,7 +531,34 @@ export class Canvas2D {
 
   start(draws) {
     this.draws = Array.isArray(draws) ? draws : [draws]
+    this.sceneTime = 0
+    this.lastFrameTime = null
     this.loop(0)
+    return this
+  }
+
+  handleTogglePause() {
+    if (this.paused) {
+      this.play()
+    } else {
+      this.pause()
+    }
+
+    return this
+  }
+
+  pause() {
+    this.paused = true
+    this.playPauseButton.textContent = 'Play'
+    this.playPauseButton.setAttribute('aria-pressed', 'true')
+    return this
+  }
+
+  play() {
+    this.paused = false
+    this.lastFrameTime = null
+    this.playPauseButton.textContent = 'Pause'
+    this.playPauseButton.setAttribute('aria-pressed', 'false')
     return this
   }
 
@@ -672,11 +728,18 @@ export class Canvas2D {
   }
 
   loop(time) {
+    if (this.lastFrameTime === null) {
+      this.lastFrameTime = time
+    } else if (!this.paused) {
+      this.sceneTime += time - this.lastFrameTime
+      this.lastFrameTime = time
+    }
+
     this.clear()
     this.gizmo.reset()
 
     for (const draw of this.draws) {
-      draw(this.gizmo, time)
+      draw(this.gizmo, this.sceneTime)
     }
 
     this.context.save()
@@ -700,6 +763,7 @@ export class Canvas2D {
     this.canvas.removeEventListener('pointerdown', this.handlePointerDown)
     this.canvas.removeEventListener('lostpointercapture', this.handleLostPointerCapture)
     this.canvas.removeEventListener('wheel', this.handleWheel)
+    this.playPauseButton.removeEventListener('click', this.handleTogglePause)
     window.removeEventListener('pointermove', this.handlePointerMove)
     window.removeEventListener('pointerup', this.handlePointerUp)
     window.removeEventListener('pointercancel', this.handlePointerUp)
