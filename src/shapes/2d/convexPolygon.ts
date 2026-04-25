@@ -1,9 +1,9 @@
 import { Shape2 } from './shape2.js'
 import { Affine2, Vector2, fuzzyEqual } from 'hisabati'
-import type { Feature } from '../../core/gjkEPA.js'
+import type { Feature, SupportMapped2d } from '../../core/gjkEPA.js'
 import { getPolygonFeature } from './utils.js'
 
-export class ConvexPolygon extends Shape2 {
+export class ConvexPolygon extends Shape2 implements SupportMapped2d {
   points: Vector2[] = []
   normals: Vector2[] = []
 
@@ -17,7 +17,7 @@ export class ConvexPolygon extends Shape2 {
     return this.points
   }
 
-  getSupportPoint(direction: Vector2, transform?: Affine2): Vector2 {
+  getSupportPoint2d(direction: Vector2, transform?: Affine2): Vector2 {
     let maxDot = -Infinity
     let support = transform
       ? transform.transform(this.points[0].clone())
@@ -38,7 +38,7 @@ export class ConvexPolygon extends Shape2 {
     return support.clone()
   }
 
-  getFeature(direction: Vector2, transform?: Affine2): Feature {
+  getFeature2d(direction: Vector2, transform?: Affine2): Feature {
     const vertices = transform
       ? this.points.map((point) => transform.transform(point.clone()))
       : this.points.map((point) => point.clone())

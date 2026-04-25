@@ -1,6 +1,6 @@
 import {
   Contact2D,
-  GJKandEPA
+  GJKandEPA2d
 } from '../../../core'
 import { Capsule, Circle, ConvexPolygon, Rectangle, Triangle } from '../../../shapes'
 import { Vector2, clamp, Affine2 } from 'hisabati'
@@ -134,14 +134,7 @@ export function capsuleRectangleContact(
   transform: Affine2,
   invTransform: Affine2
 ): Contact2D[] | undefined {
-  return GJKandEPA(
-    (direction: Vector2) => createCapsuleSupportPoint(a, direction),
-    (direction: Vector2) => a.getFeature(direction),
-    (direction: Vector2) => createShapeSupportPoint(b.getSupportPoint(direction, transform)),
-    (direction: Vector2) => b.getFeature(direction, transform),
-    transform,
-    invTransform
-  )
+  return GJKandEPA2d(a, b, transform, invTransform)
 }
 
 /**
@@ -156,14 +149,7 @@ export function capsuleTriangleContact(
   transform: Affine2,
   invTransform: Affine2
 ): Contact2D[] | undefined {
-  return GJKandEPA(
-    (direction: Vector2) => createCapsuleSupportPoint(a, direction),
-    (direction: Vector2) => a.getFeature(direction),
-    (direction: Vector2) => createShapeSupportPoint(b.getSupportPoint(direction, transform)),
-    (direction: Vector2) => b.getFeature(direction, transform),
-    transform,
-    invTransform
-  )
+  return GJKandEPA2d(a, b, transform, invTransform)
 }
 
 /**
@@ -178,30 +164,5 @@ export function capsuleConvexPolygonContact(
   transform: Affine2,
   invTransform: Affine2
 ): Contact2D[] | undefined {
-  return GJKandEPA(
-    (direction: Vector2) => createCapsuleSupportPoint(a, direction),
-    (direction: Vector2) => a.getFeature(direction),
-    (direction: Vector2) => createShapeSupportPoint(b.getSupportPoint(direction, transform)),
-    (direction: Vector2) => b.getFeature(direction, transform),
-    transform,
-    invTransform
-  )
-}
-
-function createCapsuleSupportPoint(capsule: Capsule, direction: Vector2) {
-  const pointA = capsule.getSupportPoint(direction)
-
-  return {
-    point: pointA.clone(),
-    pointA,
-    pointB: new Vector2()
-  }
-}
-
-function createShapeSupportPoint(pointB: Vector2) {
-  return {
-    point: pointB.clone(),
-    pointA: new Vector2(),
-    pointB
-  }
+  return GJKandEPA2d(a, b, transform, invTransform)
 }

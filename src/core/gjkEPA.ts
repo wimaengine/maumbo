@@ -1,13 +1,11 @@
 import { Affine2, Vector2 } from 'hisabati'
 import { Contact2D } from './contact.js'
 
-export type SupportPoint = {
-  point: Vector2
-  pointA: Vector2
-  pointB: Vector2
+export type SupportPoint<T> = {
+  point: T
+  pointA: T
+  pointB: T
 }
-
-type SupportFunction = (direction: Vector2) => SupportPoint
 
 export type Feature =
   | {
@@ -22,11 +20,14 @@ export type Feature =
       normal: Vector2
     }
 
-export type FeatureFunction = (normal: Vector2) => Feature
+export interface SupportMapped2d {
+  getSupportPoint2d(direction: Vector2, transform?: Affine2): Vector2
+  getFeature2d(direction: Vector2, transform?: Affine2): Feature
+}
 
-type EPAResult = {
+type EPAResult<T> = {
   depth: number
-  normal: Vector2
+  normal: T
 }
 
 const GJK_MAX_ITERATIONS = 24
@@ -36,51 +37,36 @@ const CONTACT_TOLERANCE = 1e-6
 
 /**
  * Generic convex support-mapped contact manifold helper.
- *
- * The support functions and feature extractors operate in A-local space.
  */
-export function GJKandEPA(
-  supportA: SupportFunction,
-  getFeatureA: FeatureFunction,
-  supportB: SupportFunction,
-  getFeatureB: FeatureFunction,
+export function GJKandEPA2d(
+  shapeA: SupportMapped2d,
+  shapeB: SupportMapped2d,
   transform: Affine2,
   invTransform: Affine2
 ): Contact2D[] | undefined {
-  const support = (direction: Vector2): SupportPoint => {
-    const pointA = supportA(direction)
-    const pointB = supportB(direction.clone().reverse())
-
-    return {
-      point: Vector2.subtract(pointA.pointA, pointB.pointB),
-      pointA: pointA.pointA,
-      pointB: pointB.pointB
-    }
-  }
-
-  const simplex = GJK(support, new Vector2(transform.x, transform.y))
+  const simplex = GJK2d(shapeA, shapeB, transform, new Vector2(transform.x, transform.y))
 
   if (!simplex) {
     return undefined
   }
 
-  const epa = EPA(simplex, support, new Vector2(transform.x, transform.y))
+  const epa = EPA2d(simplex, shapeA, shapeB, transform, new Vector2(transform.x, transform.y))
 
   if (!epa) {
     return undefined
   }
 
   let contacts = buildContactsFromFeatures(
-    getFeatureA(epa.normal),
-    getFeatureB(epa.normal.clone().reverse()),
+    shapeA.getFeature2d(epa.normal),
+    shapeB.getFeature2d(epa.normal.clone().reverse(), transform),
     epa.normal,
     epa.depth
   )
 
   if (!contacts.length) {
     contacts = buildPointPointContact(
-      supportA(epa.normal).pointA,
-      supportB(epa.normal.clone().reverse()).pointB,
+      shapeA.getSupportPoint2d(epa.normal),
+      shapeB.getSupportPoint2d(epa.normal.clone().reverse(), transform),
       epa.normal,
       epa.depth
     )
@@ -95,9 +81,14 @@ export function GJKandEPA(
   return contacts
 }
 
-function GJK(support: SupportFunction, position: Vector2): SupportPoint[] | undefined {
+export function GJK2d(
+  shapeA: SupportMapped2d,
+  shapeB: SupportMapped2d,
+  transform: Affine2,
+  position: Vector2
+): SupportPoint<Vector2>[] | undefined {
   let direction = position.magnitudeSquared() === 0 ? Vector2.X.clone() : position.clone()
-  const simplex = [support(direction)]
+  const simplex = [support(shapeA, shapeB, transform, direction)]
 
   direction = simplex[0].point.clone().reverse()
 
@@ -106,7 +97,7 @@ function GJK(support: SupportFunction, position: Vector2): SupportPoint[] | unde
       direction = Vector2.X.clone()
     }
 
-    const point = support(direction)
+    const point = support(shapeA, shapeB, transform, direction)
 
     if (Vector2.dot(point.point, direction) < 0) {
       return undefined
@@ -122,7 +113,23 @@ function GJK(support: SupportFunction, position: Vector2): SupportPoint[] | unde
   return simplex.length >= 3 ? simplex : undefined
 }
 
-function handleSimplex(simplex: SupportPoint[], direction: Vector2): boolean {
+function support(
+  shapeA: SupportMapped2d,
+  shapeB: SupportMapped2d,
+  transform: Affine2,
+  direction: Vector2
+): SupportPoint<Vector2> {
+  const pointA = shapeA.getSupportPoint2d(direction)
+  const pointB = shapeB.getSupportPoint2d(direction.clone().reverse(), transform)
+
+  return {
+    point: Vector2.subtract(pointA, pointB),
+    pointA,
+    pointB
+  }
+}
+
+function handleSimplex(simplex: SupportPoint<Vector2>[], direction: Vector2): boolean {
   const a = simplex[0]
   const ao = a.point.clone().reverse()
 
@@ -170,7 +177,13 @@ function handleSimplex(simplex: SupportPoint[], direction: Vector2): boolean {
   return true
 }
 
-function EPA(simplex: SupportPoint[], support: SupportFunction, position: Vector2): EPAResult | undefined {
+export function EPA2d(
+  simplex: SupportPoint<Vector2>[],
+  shapeA: SupportMapped2d,
+  shapeB: SupportMapped2d,
+  transform: Affine2,
+  position: Vector2
+): EPAResult<Vector2> | undefined {
   const polytope = ensureCounterClockwise(simplex.map(copySupportPoint))
 
   for (let i = 0; i < EPA_MAX_ITERATIONS; i++) {
@@ -183,7 +196,7 @@ function EPA(simplex: SupportPoint[], support: SupportFunction, position: Vector
     const alignedNormal = Vector2.dot(edge.normal, position) < 0
       ? edge.normal.clone().reverse()
       : edge.normal
-    const point = support(alignedNormal)
+    const point = support(shapeA, shapeB, transform, alignedNormal)
     const distance = Vector2.dot(point.point, alignedNormal)
 
     if (distance - edge.distance <= EPA_TOLERANCE) {
@@ -395,7 +408,7 @@ function getPointAlongNormal(depth: number, feature: Feature, normal: Vector2): 
   return closestPointOnSegment(normal.clone().multiplyScalar(depth), feature.v1, feature.v2)
 }
 
-function copySupportPoint(point: SupportPoint): SupportPoint {
+function copySupportPoint(point: SupportPoint<Vector2>): SupportPoint<Vector2> {
   return {
     point: point.point.clone(),
     pointA: point.pointA.clone(),
@@ -403,7 +416,7 @@ function copySupportPoint(point: SupportPoint): SupportPoint {
   }
 }
 
-function ensureCounterClockwise(simplex: SupportPoint[]): SupportPoint[] {
+function ensureCounterClockwise(simplex: SupportPoint<Vector2>[]): SupportPoint<Vector2>[] {
   if (simplex.length < 3) {
     return simplex
   }
@@ -424,7 +437,7 @@ function ensureCounterClockwise(simplex: SupportPoint[]): SupportPoint[] {
   return simplex
 }
 
-function findClosestEdge(polytope: SupportPoint[]): { distance: number, index: number, normal: Vector2 } | undefined {
+function findClosestEdge(polytope: SupportPoint<Vector2>[]): { distance: number, index: number, normal: Vector2 } | undefined {
   let bestDistance = Infinity
   let bestIndex = -1
   let bestNormal: Vector2 | undefined

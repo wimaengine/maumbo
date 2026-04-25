@@ -1,9 +1,9 @@
 import { Shape2 } from './shape2.js'
 import { Affine2, Vector2 } from 'hisabati'
-import type { Feature } from '../../core/gjkEPA.js'
+import type { Feature, SupportMapped2d } from '../../core/gjkEPA.js'
 import { getPolygonFeature } from './utils.js'
 
-export class Triangle extends Shape2 {
+export class Triangle extends Shape2 implements SupportMapped2d {
   halfBase = 0
   halfHeight = 0
   baseRatio = 0
@@ -26,7 +26,7 @@ export class Triangle extends Shape2 {
     return positions
   }
 
-  getSupportPoint(direction: Vector2, transform?: Affine2): Vector2 {
+  getSupportPoint2d(direction: Vector2, transform?: Affine2): Vector2 {
     const points = this.getPoints()
     let maxDot = -Infinity
     let support = transform
@@ -48,7 +48,7 @@ export class Triangle extends Shape2 {
     return support.clone()
   }
 
-  getFeature(direction: Vector2, transform?: Affine2): Feature {
+  getFeature2d(direction: Vector2, transform?: Affine2): Feature {
     const vertices = this.getPoints().map((point) => {
       return transform ? transform.transform(point.clone()) : point.clone()
     })
