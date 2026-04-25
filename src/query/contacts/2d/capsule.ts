@@ -25,16 +25,17 @@ export function capsuleContacts(
   const b0 = transform.transform(new Vector2(0, capsuleB.halfHeight))
   const b1 = transform.transform(new Vector2(0, -capsuleB.halfHeight))
   const radiusSum = capsuleA.radius + capsuleB.radius
-  const { pA, pB } = closestPointsSegmentSegment(a0, a1, b0, b1)
-  const delta = Vector2.subtract(pB, pA)
-  const separation = delta.magnitude()
-  const closest = [
-    {
-      pointA: pA,
-      pointB: pB,
-      distance: separation
-    }
-  ]
+  const closest = closestPointsSegmentSegment(a0, a1, b0, b1)
+    .map(({ pA, pB }) => {
+      const delta = Vector2.subtract(pB, pA)
+
+      return {
+        pointA: pA,
+        pointB: pB,
+        delta,
+        distance: delta.magnitude()
+      }
+    })
   const contacts = closest
     .map((point) => {
     const distance = radiusSum - point.distance
@@ -43,8 +44,8 @@ export function capsuleContacts(
       return undefined
     }
 
-    const normalA = separation !== 0
-      ? Vector2.divideScalar(delta, separation)
+    const normalA = point.distance !== 0
+      ? Vector2.divideScalar(point.delta, point.distance)
       : Vector2.Y.clone()
     const normalB = Affine2.transformWithoutTranslation(invTransform, normalA).reverse()
     const tangentA = Vector2.normal(normalA)

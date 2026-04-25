@@ -21,18 +21,19 @@ export function closestPointOnSegment2D(a: Vector2, b: Vector2, p: Vector2): Vec
 
 /**
  * Closest points between two segments in 2D.
+ * Returns two points when nearly-parallel segments overlap along their span.
  * @param {Vector2} a0
  * @param {Vector2} a1
  * @param {Vector2} b0
  * @param {Vector2} b1
- * @returns {{pA: Vector2, pB: Vector2}}
+ * @returns {{pA: Vector2, pB: Vector2}[]}
  */
 export function closestPointsSegmentSegment(
   a0: Vector2,
   a1: Vector2,
   b0: Vector2,
   b1: Vector2
-): { pA: Vector2; pB: Vector2 } {
+): { pA: Vector2; pB: Vector2 }[] {
   const d1 = Vector2.subtract(a1, a0)
   const d2 = Vector2.subtract(b1, b0)
   const r = Vector2.subtract(a0, b0)
@@ -42,8 +43,43 @@ export function closestPointsSegmentSegment(
   const f = Vector2.dot(d2, r)
 
   const EPS = 1e-8
+  const PARALLEL_EPS = 1e-6
   let s = 0
   let t = 0
+
+  if (a > EPS && e > EPS) {
+    const b = Vector2.dot(d1, d2)
+    const denom = a * e - b * b
+
+    if (Math.abs(denom) <= PARALLEL_EPS * a * e) {
+      const lengthA = Math.sqrt(a)
+      const axis = Vector2.divideScalar(d1, lengthA)
+      const b0Projection = Vector2.dot(Vector2.subtract(b0, a0), axis)
+      const b1Projection = Vector2.dot(Vector2.subtract(b1, a0), axis)
+      const minB = Math.min(b0Projection, b1Projection)
+      const maxB = Math.max(b0Projection, b1Projection)
+      const overlapStart = Math.max(0, minB)
+      const overlapEnd = Math.min(lengthA, maxB)
+
+      if (overlapEnd - overlapStart > EPS) {
+        const axisB = b1Projection - b0Projection
+        function makePointPair(projection: number) {
+          const pA = Vector2.add(a0, Vector2.multiplyScalar(axis, projection))
+          const ratio = axisB === 0
+            ? 0
+            : clamp((projection - b0Projection) / axisB, 0, 1)
+          const pB = Vector2.add(b0, Vector2.multiplyScalar(d2, ratio))
+
+          return { pA, pB }
+        }
+
+        return [
+          makePointPair(overlapStart),
+          makePointPair(overlapEnd)
+        ]
+      }
+    }
+  }
 
   if (a <= EPS && e <= EPS) {
     s = 0
@@ -82,7 +118,7 @@ export function closestPointsSegmentSegment(
   const pA = Vector2.add(a0, Vector2.multiplyScalar(d1, s))
   const pB = Vector2.add(b0, Vector2.multiplyScalar(d2, t))
 
-  return { pA, pB }
+  return [{ pA, pB }]
 }
 
 /**
