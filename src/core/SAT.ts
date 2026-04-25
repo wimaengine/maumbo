@@ -1,5 +1,5 @@
 import { Affine2, Vector2, invert } from 'hisabati'
-import { Capsule, Circle } from '../shapes'
+import { Circle } from '../shapes'
 import { Contact2D } from './contact.js'
 
 class SATProjection {
@@ -86,53 +86,6 @@ export function sat2dCircle(
 
   const verticesA = circle.getVertices(results.axis)
 
-  const contacts = getContacts(verticesA, vertices, results, position)
-
-  if (contacts) {
-    contacts.map((contact) => {
-      invTransform.transform(contact.pointB)
-      contact.normalB = Affine2.transformWithoutTranslation(invTransform, contact.normalB)
-      contact.tangentB = contact.tangentB
-        ? Affine2.transformWithoutTranslation(invTransform, contact.tangentB)
-        : Vector2.normal(contact.normalB)
-      return contact
-    })
-  }
-
-  return contacts
-}
-
-/**
- * @param {Capsule} capsule
- * @param {Vector2[]} vertices
- * @param {Vector2[]} axes
- * @param {Affine2} transform
- * @param {Affine2} invTransform
- */
-export function sat2dCapsule(
-  capsule: Capsule,
-  vertices: Vector2[],
-  axes: Vector2[],
-  transform: Affine2,
-  invTransform: Affine2
-): Contact2D[] | undefined {
-  const position = new Vector2(
-    transform.x,
-    transform.y
-  )
-  const closestAxis = getCapsuleClosestVertexAxis(capsule, vertices)
-
-  // Add the capsule's side normal (X-axis in local space) to the candidate axes
-  const capsuleAxes = [Vector2.X.clone()]
-  const allAxes = closestAxis
-    ? [...axes, closestAxis, ...capsuleAxes]
-    : [...axes, ...capsuleAxes]
-
-  const results = projectCapsuleVerticesToAxes(capsule, vertices, allAxes)
-
-  if (!results) return undefined
-
-  const verticesA = capsule.getVertices(results.axis)
   const contacts = getContacts(verticesA, vertices, results, position)
 
   if (contacts) {
@@ -317,40 +270,6 @@ function projectCircleVerticesToAxes(
 }
 
 /**
- * @param {Capsule} capsule
- * @param {Vector2[]} vertices
- * @param {Vector2[]} axes
- */
-function projectCapsuleVerticesToAxes(
-  capsule: Capsule,
-  vertices: Vector2[],
-  axes: Vector2[]
-): SATStructure | undefined {
-  const axis = new Vector2()
-  const point = new SATStructure()
-
-  for (let i = 0; i < axes.length; i++) {
-    Vector2.copy(axes[i], axis)
-    const p1 = projectCapsuleToAxis(capsule, axis)
-    const p2 = projectVerticesToAxis(vertices, axis)
-    const overlap = Math.min(p1.max - p2.min, p2.max - p1.min)
-
-    if (overlap < 0) return undefined
-    if (overlap < point.overlap) {
-      Vector2.copy(axis, point.axis)
-      point.overlap = overlap
-    }
-  }
-
-  const length = invert(Vector2.magnitude(point.axis))
-
-  point.overlap *= length
-  Vector2.multiplyScalar(point.axis, length, point.axis)
-
-  return point
-}
-
-/**
  * @param {Vector2[]} vertices
  * @param {Vector2} axis
  */
@@ -388,68 +307,6 @@ function projectCircleToAxis(circle: Circle, axis: Vector2): SATProjection {
   }
 
   return new SATProjection(v1, v2)
-}
-
-/**
- * @param {Capsule} capsule
- * @param {Vector2} axis
- */
-function projectCapsuleToAxis(capsule: Capsule, axis: Vector2): SATProjection {
-  const top = new Vector2(0, capsule.halfHeight)
-  const bottom = new Vector2(0, -capsule.halfHeight)
-  const p1 = Vector2.dot(axis, top)
-  const p2 = Vector2.dot(axis, bottom)
-  const radiusProjection = Vector2.magnitude(axis) * capsule.radius
-
-  return new SATProjection(
-    Math.min(p1, p2) - radiusProjection,
-    Math.max(p1, p2) + radiusProjection
-  )
-}
-
-/**
- * @param {Capsule} capsule
- * @param {Vector2[]} vertices
- */
-function getCapsuleClosestVertexAxis(
-  capsule: Capsule,
-  vertices: Vector2[]
-): Vector2 | undefined {
-  const top = new Vector2(0, capsule.halfHeight)
-  const bottom = new Vector2(0, -capsule.halfHeight)
-  let axis: Vector2 | undefined
-  let minDistanceSq = Infinity
-
-  for (let i = 0; i < vertices.length; i++) {
-    const closest = closestPointOnSegment(vertices[i], bottom, top)
-    const delta = Vector2.subtract(vertices[i], closest)
-    const distanceSq = delta.magnitudeSquared()
-
-    if (distanceSq > 0 && distanceSq < minDistanceSq) {
-      minDistanceSq = distanceSq
-      axis = delta.normalize()
-    }
-  }
-
-  return axis
-}
-
-/**
- * @param {Vector2} point
- * @param {Vector2} a
- * @param {Vector2} b
- */
-function closestPointOnSegment(point: Vector2, a: Vector2, b: Vector2): Vector2 {
-  const ab = Vector2.subtract(b, a)
-  const abLengthSq = ab.magnitudeSquared()
-
-  if (abLengthSq === 0) {
-    return Vector2.copy(a)
-  }
-
-  const t = Math.max(0, Math.min(1, Vector2.dot(Vector2.subtract(point, a), ab) / abLengthSq))
-
-  return Vector2.add(a, Vector2.multiplyScalar(ab, t))
 }
 
 /**
