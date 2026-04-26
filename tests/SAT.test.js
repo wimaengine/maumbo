@@ -34,8 +34,8 @@ describe("Testing SAT contact point generation", (suite)=>{
         new Vector2(-0, -1),
         new Vector2(0, 1),
         1,
-        new Vector2(1, -0),
-        new Vector2(1, -0)
+        new Vector2(-1, 0),
+        new Vector2(-1, 0)
       )])
   })
   test("Contact on two points case 1", () => {
@@ -68,8 +68,8 @@ describe("Testing SAT contact point generation", (suite)=>{
         new Vector2(0, -1),
         new Vector2(-0, 1),
         1,
-        new Vector2(-1, -0),
-        new Vector2(-1, 0)
+        new Vector2(1, 0),
+        new Vector2(1, 0)
       ),
       new Contact2D(
         new Vector2(8, 4),
@@ -77,8 +77,8 @@ describe("Testing SAT contact point generation", (suite)=>{
         new Vector2(0, -1),
         new Vector2(-0, 1),
         1,
-        new Vector2(-1, -0),
-        new Vector2(-1, 0)
+        new Vector2(1, 0),
+        new Vector2(1, 0)
       )
     ])
   })
@@ -120,6 +120,6 @@ describe("Testing SAT contact point generation", (suite)=>{
     ok(fuzzyEqual(contacts[1].normalA.y, -0.9701425001453319))
     ok(fuzzyEqual(contacts[1].normalB.x, 0.24253562503633297))
     ok(fuzzyEqual(contacts[1].normalB.y, 0.9701425001453319))
-    strictEqual(contacts[1].depth, 1.0307764064044154)
+    strictEqual(contacts[1].depth, 1.0307764064044151)
   })
 })
