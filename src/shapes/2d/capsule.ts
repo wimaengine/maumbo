@@ -1,5 +1,5 @@
 import { Affine2, Vector2 } from 'hisabati'
-import type { Feature, SupportMapped2d } from '../../core/gjkEPA.js'
+import type { Feature, SupportMapped2d } from '../../core'
 
 export class Capsule implements SupportMapped2d {
   radius = 0

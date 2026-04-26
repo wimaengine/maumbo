@@ -1,7 +1,6 @@
 import { Shape2 } from './shape2.js'
 import { Affine2, Vector2 } from 'hisabati'
-import type { Feature, SupportMapped2d } from '../../core/gjkEPA.js'
-import { getPolygonFeature } from './utils.js'
+import { getPolygonFeature, type Feature, type SupportMapped2d } from '../../core'
 
 export class Triangle extends Shape2 implements SupportMapped2d {
   halfBase = 0
