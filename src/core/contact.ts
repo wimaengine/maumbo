@@ -29,13 +29,13 @@ export class Contact2D {
 
   clone(): Contact2D {
     return new Contact2D(
-      this.pointA,
-      this.pointB,
-      this.normalA,
-      this.normalB,
+      this.pointA.clone(),
+      this.pointB.clone(),
+      this.normalA.clone(),
+      this.normalB.clone(),
       this.depth,
-      this.tangentA,
-      this.tangentB
+      this.tangentA.clone(),
+      this.tangentB.clone()
     )
   }
 
