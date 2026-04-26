@@ -1,13 +1,29 @@
 import { Vector2 } from 'hisabati'
 
+export const IntersectionType2D = {
+  Point: 0,
+  Segment: 1
+} as const
 export class Intersection2D {
-  readonly point = new Vector2()
-  readonly normal = new Vector2()
-  readonly distance:number
+  points:Vector2[] = []
+  normal = new Vector2()
+  tangent = new Vector2()
 
-  constructor(point: Vector2, normal: Vector2, distance: number) {
-    this.point = point
+  constructor(
+    points: Vector2[],
+    normal: Vector2,
+    tangent: Vector2
+  ) {
+    this.points = points
     this.normal = normal
-    this.distance = distance
+    this.tangent = tangent
+  }
+
+  clone(): Intersection2D {
+    return new Intersection2D(
+      this.points.map(p=>p.clone()),
+      this.normal.clone(),
+      this.tangent.clone()
+    )
   }
 }
