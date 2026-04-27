@@ -1,8 +1,9 @@
 import { Shape2 } from './shape2.js'
 import { Affine2, Vector2 } from 'hisabati'
 import { getPolygonFeature, type Feature, type SupportMapped2d } from '../../core'
+import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
 
-export class Triangle extends Shape2 implements SupportMapped2d {
+export class Triangle extends Shape2 implements SupportMapped2d, Boundable2D {
   halfBase = 0
   halfHeight = 0
   baseRatio = 0
@@ -21,7 +22,7 @@ export class Triangle extends Shape2 implements SupportMapped2d {
       new Vector2(halfBase, -halfHeight),
       new Vector2(halfBase * baseRatio, halfHeight)
     ]
-    
+
     return positions
   }
 
@@ -53,5 +54,22 @@ export class Triangle extends Shape2 implements SupportMapped2d {
     })
 
     return getPolygonFeature(vertices, direction)
+  }
+
+  aabb2d(): BoundingBox2D {
+    return new BoundingBox2D(
+      -this.halfBase,
+      -this.halfHeight,
+      this.halfBase,
+      this.halfHeight
+    )
+  }
+  boundingCircle(): BoundingCircle {
+    const {halfBase, halfHeight} = this
+    return new BoundingCircle(
+      0,
+      0,
+      Math.sqrt(halfBase * halfBase + halfHeight * halfHeight)
+    )
   }
 }
