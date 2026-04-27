@@ -1,8 +1,9 @@
 import { Shape2 } from './shape2.js'
 import { Affine2, Vector2, fuzzyEqual } from 'hisabati'
 import { getPolygonFeature, type Feature, type SupportMapped2d } from '../../core'
+import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
 
-export class ConvexPolygon extends Shape2 implements SupportMapped2d {
+export class ConvexPolygon extends Shape2 implements SupportMapped2d, Boundable2D {
   points: Vector2[] = []
   normals: Vector2[] = []
 
@@ -45,6 +46,45 @@ export class ConvexPolygon extends Shape2 implements SupportMapped2d {
     return getPolygonFeature(vertices, direction)
   }
 
+  aabb2d(): BoundingBox2D {
+    const { points } = this
+    let minX = Infinity, minY = Infinity;
+    let maxX = -Infinity, maxY = -Infinity;
+
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+
+      if (p.x < minX) minX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y > maxY) maxY = p.y;
+    }
+
+    return new BoundingBox2D(
+      minX,
+      minY,
+      maxX,
+      maxY
+    )
+  }
+
+  boundingCircle(): BoundingCircle {
+    const { points } = this
+    let maxDistSq = 0;
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+      const d2 = p.magnitudeSquared()
+
+      if (d2 > maxDistSq) maxDistSq = d2;
+    }
+
+    return new BoundingCircle(
+      0,
+      0,
+      Math.sqrt(maxDistSq)
+    )
+  }
+
   static fromPoints(points: Vector2[]): ConvexPolygon {
     const normals = calcFaceNormals2D(points)
 
@@ -60,18 +100,18 @@ export class ConvexPolygon extends Shape2 implements SupportMapped2d {
 function calcFaceNormals2D(vertices: Vector2[], tolerance?: number): Vector2[] {
   const axes: Vector2[] = []
   const { length } = vertices
-  
+
   for (let i = 0, j = length - 1; i < length; j = i, i++) {
     const previous = vertices[j]
     const current = vertices[i]
     const axis = Vector2.subtract(previous, current)
-    
+
     Vector2.normal(axis, axis)
     Vector2.normalize(axis, axis)
 
     if (!checkifEquals(axis, axes, tolerance)) axes.push(axis)
   }
-  
+
   return axes
 }
 
@@ -82,7 +122,7 @@ function calcFaceNormals2D(vertices: Vector2[], tolerance?: number): Vector2[] {
  */
 function checkifEquals(axis: Vector2, axes: Vector2[], tolerance?: number): boolean {
   const reverse = axis.clone().reverse()
-  
+
   for (let i = 0; i < axes.length; i++) {
     const refAxis = axes[i]
 
