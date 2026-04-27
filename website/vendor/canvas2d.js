@@ -817,3 +817,56 @@ export function drawContacts(gizmo, contacts, transformA, transformB) {
 
   return true
 }
+
+export function drawIntersections(gizmo, intersections, transformA, transformB) {
+  if (!intersections || intersections.length === 0) {
+    return false
+  }
+
+  for (const intersection of intersections) {
+    const worldPoints = intersection.points.map((point) => {
+      return Affine2.transform(transformA, point.clone())
+    })
+
+    if (!worldPoints.length) {
+      continue
+    }
+
+    if (worldPoints.length === 1) {
+      const point = worldPoints[0]
+
+      gizmo
+        .reset()
+        .translate(point.x, point.y)
+        .circle(3, Color.CYAN)
+    } else {
+      gizmo
+        .reset()
+        .lineStrip(worldPoints, Color.CYAN, false)
+
+      for (const point of worldPoints) {
+        gizmo
+          .reset()
+          .translate(point.x, point.y)
+          .circle(2, Color.CYAN)
+      }
+    }
+
+    const anchor = worldPoints[Math.floor(worldPoints.length / 2)] ?? worldPoints[0]
+    const normal = Affine2
+      .transformWithoutTranslation(transformA, intersection.normal.clone())
+      .normalize()
+      .multiplyScalar(20)
+    const tangent = Affine2
+      .transformWithoutTranslation(transformA, intersection.tangent.clone())
+      .normalize()
+      .multiplyScalar(20)
+
+    gizmo
+      .reset()
+      .line(anchor, Vector2.add(anchor, normal), Color.RED)
+      .line(anchor, Vector2.add(anchor, tangent), Color.YELLOW)
+  }
+
+  return true
+}
