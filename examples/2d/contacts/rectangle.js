@@ -2,6 +2,7 @@ import {
   Rectangle,
   getShape2Contacts,
   Circle,
+  Line2,
   Triangle,
   ConvexPolygon,
   Capsule
@@ -40,7 +41,12 @@ canvas2d.start([
   rectangleCapsule2,
   rectangleCapsule3,
   rectangleCapsule4,
-  rectangleCapsule5
+  rectangleCapsule5,
+  rectangleLine1,
+  rectangleLine2,
+  rectangleLine3,
+  rectangleLine4,
+  rectangleLine5
 ])
 
 /**
@@ -882,6 +888,170 @@ function rectangleCapsule5(gizmo, time) {
     .axes(30)
     .setTransform(transformB)
     .capsule(capRadius, capHalfHeight)
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function rectangleLine1(gizmo, time) {
+  const elapsed = time * 0.001
+  const width = 40
+  const height = 40
+  const length = 50
+  const center = new Vector2(100, 1300)
+  const shapeA = new Rectangle(width, height)
+  const shapeB = new Line2(length)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .rotate(Rotary.fromAngle(-elapsed * 0.4))
+    .translate(new Vector2(45, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .aabb(width, height)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-length, 0), new Vector2(length, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function rectangleLine2(gizmo, time) {
+  const elapsed = time * 0.001
+  const width = 40
+  const height = 40
+  const length = 50
+  const center = new Vector2(300, 1300)
+  const shapeA = new Rectangle(width, height)
+  const shapeB = new Line2(length)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(45, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .aabb(width, height)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-length, 0), new Vector2(length, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function rectangleLine3(gizmo, time) {
+  const elapsed = time * 0.001
+  const width = 40
+  const height = 40
+  const length = 50
+  const center = new Vector2(500, 1300)
+  const shapeA = new Rectangle(width, height)
+  const shapeB = new Line2(length)
+  const transformA = new Affine2()
+    .rotate(Rotary.fromAngle(-elapsed * 0.4))
+    .translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(45, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .aabb(width, height)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-length, 0), new Vector2(length, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function rectangleLine4(gizmo, time) {
+  const elapsed = time * 0.001
+  const width = 20
+  const height = 20
+  const length = 60
+  const center = new Vector2(700, 1300)
+  const shapeA = new Rectangle(width, height)
+  const shapeB = new Line2(length)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .rotate(Rotary.fromAngle(-elapsed * 0.4))
+    .translate(new Vector2(25, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .aabb(width, height)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-length, 0), new Vector2(length, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function rectangleLine5(gizmo, time) {
+  const elapsed = time * 0.001
+  const width = 20
+  const height = 20
+  const length = 60
+  const center = new Vector2(900, 1300)
+  const shapeA = new Rectangle(width, height)
+  const shapeB = new Line2(length)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(20, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .aabb(width, height)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-length, 0), new Vector2(length, 0))
     .axes(30)
     .reset()
 

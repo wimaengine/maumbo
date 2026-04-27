@@ -1,6 +1,7 @@
 import {
   Capsule,
   Circle,
+  Line2,
   Rectangle,
   Triangle,
   ConvexPolygon,
@@ -40,7 +41,12 @@ canvas2d.start([
   capsulePolygon2,
   capsulePolygon3,
   capsulePolygon4,
-  capsulePolygon5
+  capsulePolygon5,
+  capsuleLine1,
+  capsuleLine2,
+  capsuleLine3,
+  capsuleLine4,
+  capsuleLine5
 ])
 
 /**
@@ -884,6 +890,155 @@ function capsulePolygon5(gizmo, time) {
     .axes(30)
     .setTransform(transformB)
     .lineStrip(shapeB.getPoints(), Color.WHITE)
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function capsuleLine1(gizmo, time) {
+  const elapsed = time * 0.001
+  const cap1 = new Capsule(20, 20)
+  const line2 = new Line2(50)
+  const center = new Vector2(100, 1100)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .rotate(Rotary.fromAngle(-elapsed * 0.4))
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(cap1, line2, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .capsule(cap1.radius, cap1.halfHeight)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-line2.halfLength, 0), new Vector2(line2.halfLength, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function capsuleLine2(gizmo, time) {
+  const elapsed = time * 0.001
+  const cap1 = new Capsule(20, 20)
+  const line2 = new Line2(50)
+  const center = new Vector2(300, 1100)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(cap1, line2, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .capsule(cap1.radius, cap1.halfHeight)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-line2.halfLength, 0), new Vector2(line2.halfLength, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function capsuleLine3(gizmo, time) {
+  const elapsed = time * 0.001
+  const cap1 = new Capsule(20, 20)
+  const line2 = new Line2(50)
+  const center = new Vector2(500, 1100)
+  const transformA = new Affine2()
+    .rotate(Rotary.fromAngle(-elapsed * 0.4))
+    .translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(cap1, line2, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .capsule(cap1.radius, cap1.halfHeight)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-line2.halfLength, 0), new Vector2(line2.halfLength, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function capsuleLine4(gizmo, time) {
+  const elapsed = time * 0.001
+  const cap1 = new Capsule(10, 10)
+  const line2 = new Line2(60)
+  const center = new Vector2(700, 1100)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .rotate(Rotary.fromAngle(-elapsed * 0.4))
+    .translate(new Vector2(25, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(cap1, line2, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .capsule(cap1.radius, cap1.halfHeight)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-line2.halfLength, 0), new Vector2(line2.halfLength, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function capsuleLine5(gizmo, time) {
+  const elapsed = time * 0.001
+  const cap1 = new Capsule(10, 10)
+  const line2 = new Line2(60)
+  const center = new Vector2(900, 1100)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(20, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(cap1, line2, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .capsule(cap1.radius, cap1.halfHeight)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-line2.halfLength, 0), new Vector2(line2.halfLength, 0))
     .axes(30)
     .reset()
 

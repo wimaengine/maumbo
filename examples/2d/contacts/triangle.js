@@ -4,7 +4,8 @@ import {
   ConvexPolygon,
   getShape2Contacts,
   Circle,
-  Capsule
+  Capsule,
+  Line2
 } from 'maumbo'
 import {
   Canvas2D,
@@ -40,7 +41,12 @@ canvas2d.start([
   triangleCapsule2,
   triangleCapsule3,
   triangleCapsule4,
-  triangleCapsule5
+  triangleCapsule5,
+  triangleLine1,
+  triangleLine2,
+  triangleLine3,
+  triangleLine4,
+  triangleLine5
 ])
 
 /**
@@ -798,6 +804,155 @@ function triangleCapsule5(gizmo, time) {
     .axes(30)
     .setTransform(transformB)
     .capsule(cap2.radius, cap2.halfHeight)
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function triangleLine1(gizmo, time) {
+  const elapsed = time * 0.001
+  const tri1 = new Triangle(50, 50)
+  const line2 = new Line2(50)
+  const center = new Vector2(100, 1100)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .rotate(Rotary.fromAngle(-elapsed * 0.4))
+    .translate(new Vector2(45, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(tri1, line2, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .lineStrip(tri1.getPoints(), Color.WHITE)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-line2.halfLength, 0), new Vector2(line2.halfLength, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function triangleLine2(gizmo, time) {
+  const elapsed = time * 0.001
+  const tri1 = new Triangle(50, 50)
+  const line2 = new Line2(50)
+  const center = new Vector2(300, 1100)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(45, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(tri1, line2, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .lineStrip(tri1.getPoints(), Color.WHITE)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-line2.halfLength, 0), new Vector2(line2.halfLength, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function triangleLine3(gizmo, time) {
+  const elapsed = time * 0.001
+  const tri1 = new Triangle(50, 50, -1)
+  const line2 = new Line2(50)
+  const center = new Vector2(500, 1100)
+  const transformA = new Affine2()
+    .rotate(Rotary.fromAngle(-elapsed * 0.4))
+    .translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(45, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(tri1, line2, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .lineStrip(tri1.getPoints(), Color.WHITE)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-line2.halfLength, 0), new Vector2(line2.halfLength, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function triangleLine4(gizmo, time) {
+  const elapsed = time * 0.001
+  const tri1 = new Triangle(30, 30, -1)
+  const line2 = new Line2(60)
+  const center = new Vector2(700, 1100)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .rotate(Rotary.fromAngle(-elapsed * 0.4))
+    .translate(new Vector2(25, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(tri1, line2, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .lineStrip(tri1.getPoints(), Color.WHITE)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-line2.halfLength, 0), new Vector2(line2.halfLength, 0))
+    .axes(30)
+    .reset()
+
+  if (!drawContacts(gizmo, contacts, transformA, transformB)) return
+}
+
+/**
+ * @param {Gizmo2D} gizmo
+ * @param {number} time
+ */
+function triangleLine5(gizmo, time) {
+  const elapsed = time * 0.001
+  const tri1 = new Triangle(30, 30)
+  const line2 = new Line2(60)
+  const center = new Vector2(900, 1100)
+  const transformA = new Affine2().translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(20, 0))
+    .rotate(Rotary.fromAngle(elapsed * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(tri1, line2, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .lineStrip(tri1.getPoints(), Color.WHITE)
+    .axes(30)
+    .setTransform(transformB)
+    .line(new Vector2(-line2.halfLength, 0), new Vector2(line2.halfLength, 0))
     .axes(30)
     .reset()
 
