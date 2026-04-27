@@ -1,5 +1,4 @@
-import { Circle, Capsule, Line2, Rectangle, ConvexPolygon, Triangle } from '../../../shapes'
-import { Shape2 } from '../../../shapes'
+import { Circle, Capsule, Line2, Rectangle, ConvexPolygon, Triangle, type Shape2 } from '../../../shapes'
 import { Affine2 } from 'hisabati'
 import { Contact2D } from '../../../core'
 import {

@@ -6,7 +6,7 @@ import {
   ConvexPolygon,
   Line2,
   Rectangle,
-  Shape2,
+  type Shape2,
   Triangle
 } from '../../../shapes'
 

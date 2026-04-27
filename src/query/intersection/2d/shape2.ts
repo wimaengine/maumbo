@@ -1,6 +1,6 @@
 import { Affine2 } from 'hisabati'
 import { Intersection2D } from '../../../core'
-import { Capsule, Shape2 } from '../../../shapes'
+import { Capsule, type Shape2 } from '../../../shapes'
 import { intersectShapes2d } from './utils.js'
 
 export function getShape2Intersections(

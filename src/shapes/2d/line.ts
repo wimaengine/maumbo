@@ -1,11 +1,9 @@
 import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
-import { Shape2 } from './shape2.js'
 
-export class Line2 extends Shape2 implements Boundable2D {
+export class Line2 implements Boundable2D {
   halfLength = 0
 
   constructor(halfLength: number) {
-    super()
     this.halfLength = halfLength
   }
 

@@ -1,14 +1,12 @@
-import { Shape2 } from './shape2.js'
 import { Affine2, Vector2, fuzzyEqual } from 'hisabati'
 import { getPolygonFeature, type Feature, type SupportMapped2d } from '../../core'
 import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
 
-export class ConvexPolygon extends Shape2 implements SupportMapped2d, Boundable2D {
+export class ConvexPolygon implements SupportMapped2d, Boundable2D {
   points: Vector2[] = []
   normals: Vector2[] = []
 
   constructor(points: Vector2[], normals: Vector2[]) {
-    super()
     this.points = points
     this.normals = normals
   }

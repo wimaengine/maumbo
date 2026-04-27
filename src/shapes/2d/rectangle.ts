@@ -1,14 +1,12 @@
-import { Shape2 } from './shape2.js'
 import { Affine2, Vector2 } from 'hisabati'
 import { getPolygonFeature, type Feature, type SupportMapped2d } from '../../core'
 import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
 
-export class Rectangle extends Shape2 implements SupportMapped2d, Boundable2D {
+export class Rectangle implements SupportMapped2d, Boundable2D {
   halfWidth = 0
   halfHeight = 0
 
   constructor(halfWidth: number, halfHeight: number) {
-    super()
     this.halfWidth = halfWidth
     this.halfHeight = halfHeight
   }
