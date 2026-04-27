@@ -1,7 +1,8 @@
+import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
 import { Shape2 } from './shape2.js'
 import { Vector2, TAU } from 'hisabati'
 
-export class Circle extends Shape2 {
+export class Circle extends Shape2 implements Boundable2D {
   radius = 0
 
   constructor(radius: number) {
@@ -33,4 +34,21 @@ export class Circle extends Shape2 {
 
     return vertices
   }
+
+    aabb2d(): BoundingBox2D {
+      return new BoundingBox2D(
+        -this.radius
+        -this.radius,
+        this.radius,
+        this.radius
+      )
+    }
+  
+    boundingCircle(): BoundingCircle {
+      return new BoundingCircle(
+        0,
+        0,
+        this.radius
+      )
+    }
 }
