@@ -1,7 +1,8 @@
 import { Affine2, Vector2 } from 'hisabati'
 import type { Feature, SupportMapped2d } from '../../core'
+import { BoundingBox2D, type Boundable2D, BoundingCircle } from '../../bounds'
 
-export class Capsule implements SupportMapped2d {
+export class Capsule implements SupportMapped2d, Boundable2D {
   radius = 0
   halfHeight = 0
 
@@ -94,5 +95,22 @@ export class Capsule implements SupportMapped2d {
     }
 
     return points
+  }
+
+  aabb2d(): BoundingBox2D {
+    return new BoundingBox2D(
+      -this.radius
+      -(this.radius + this.halfHeight),
+      this.radius,
+      (this.radius + this.halfHeight)
+    )
+  }
+
+  boundingCircle(): BoundingCircle {
+    return new BoundingCircle(
+      0,
+      0,
+      this.radius + this.halfHeight
+    )
   }
 }
