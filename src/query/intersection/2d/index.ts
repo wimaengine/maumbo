@@ -1,0 +1,7 @@
+export * from './capsule.js'
+export * from './circle.js'
+export * from './line.js'
+export * from './polygon.js'
+export * from './rectangle.js'
+export * from './shape2.js'
+export * from './triangle.js'
