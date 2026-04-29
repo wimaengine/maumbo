@@ -1,4 +1,4 @@
-import { Vector3 } from 'hisabati'
+import { Affine3, Vector3 } from 'hisabati'
 
 /**
  * A 2d axis aligned bounding box.
@@ -26,6 +26,10 @@ export class BoundingBox3D {
 
   translate(translation:Vector3) {
     return BoundingBox3D.translate(this, translation, this)
+  }
+
+  transform(affine: Affine3){
+    BoundingBox3D.transform(this,affine, this)
   }
 
   /**
@@ -65,6 +69,15 @@ export class BoundingBox3D {
     out.max.x = bound.max.x + translate.x
     out.max.y = bound.max.y + translate.y
     out.max.z = bound.max.z + translate.z
+
+    return out
+  }
+
+  /**
+   */
+  static transform(bound:BoundingBox3D, transform:Affine3, out: BoundingBox3D) {
+    Affine3.transform(transform,bound.min,out.min)
+    Affine3.transform(transform,bound.max,out.max)
 
     return out
   }
