@@ -1,7 +1,8 @@
 import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
-import { Vector2, TAU } from 'hisabati'
+import { Vector2, TAU, Affine2 } from 'hisabati'
+import type { Feature, SupportMapped2d } from '../../core/clipping.js'
 
-export class Circle implements Boundable2D {
+export class Circle implements Boundable2D, SupportMapped2d {
   radius = 0
 
   constructor(radius: number) {
@@ -33,20 +34,48 @@ export class Circle implements Boundable2D {
     return vertices
   }
 
-    aabb2d(): BoundingBox2D {
-      return new BoundingBox2D(
-        -this.radius
-        -this.radius,
-        this.radius,
-        this.radius
-      )
+  getSupportPoint2d(direction: Vector2, transform?: Affine2): Vector2 {
+    const axis = direction.magnitudeSquared() === 0
+      ? Vector2.X.clone()
+      : direction.clone()
+
+    if (!transform) {
+      return axis.setMagnitude(this.radius)
     }
-  
-    boundingCircle(): BoundingCircle {
-      return new BoundingCircle(
-        0,
-        0,
-        this.radius
-      )
+
+    const localDirection = new Vector2(
+      transform.a * axis.x + transform.b * axis.y,
+      transform.c * axis.x + transform.d * axis.y
+    ).setMagnitude(this.radius)
+
+    return transform.transform(localDirection)
+  }
+  getFeature2d(direction: Vector2, transform?: Affine2): Feature {
+    const normal = direction.magnitudeSquared() === 0
+      ? Vector2.X.clone()
+      : direction.clone().normalize()
+
+    return {
+      type: 'point',
+      point: this.getSupportPoint2d(direction, transform),
+      normal
     }
+  }
+
+  aabb2d(): BoundingBox2D {
+    return new BoundingBox2D(
+      -this.radius
+      - this.radius,
+      this.radius,
+      this.radius
+    )
+  }
+
+  boundingCircle(): BoundingCircle {
+    return new BoundingCircle(
+      0,
+      0,
+      this.radius
+    )
+  }
 }
