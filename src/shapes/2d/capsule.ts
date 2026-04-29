@@ -1,4 +1,4 @@
-import { Affine2, Vector2 } from 'hisabati'
+import { Vector2 } from 'hisabati'
 import type { Feature, SupportMapped2d } from '../../core'
 import { BoundingBox2D, type Boundable2D, BoundingCircle } from '../../bounds'
 
@@ -31,7 +31,7 @@ export class Capsule implements SupportMapped2d, Boundable2D {
     ]
   }
 
-  getSupportPoint2d(direction: Vector2, _transform?: Affine2): Vector2 {
+  getSupportPoint2d(direction: Vector2): Vector2 {
     const axis = direction.magnitudeSquared() === 0
       ? Vector2.X.clone()
       : direction.clone().normalize()
@@ -42,7 +42,7 @@ export class Capsule implements SupportMapped2d, Boundable2D {
     return Vector2.multiplyScalar(axis, this.radius).add(center)
   }
 
-  getFeature2d(direction: Vector2, _transform?: Affine2): Feature {
+  getFeature2d(direction: Vector2): Feature {
     if (Math.abs(direction.x) >= Math.abs(direction.y)) {
       const side = Math.sign(direction.x) || 1
 

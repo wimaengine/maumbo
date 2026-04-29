@@ -15,8 +15,25 @@ export type Feature =
     }
 
 export interface SupportMapped2d {
-  getSupportPoint2d(direction: Vector2, transform?: Affine2): Vector2
-  getFeature2d(direction: Vector2, transform?: Affine2): Feature
+  getSupportPoint2d(direction: Vector2): Vector2
+  getFeature2d(direction: Vector2): Feature
+}
+
+export function transformFeature2d(feature: Feature, transform: Affine2): Feature {
+  if (feature.type === 'point') {
+    return {
+      type: 'point',
+      point: Affine2.transform(transform, feature.point.clone()),
+      normal: Affine2.transformWithoutTranslation(transform, feature.normal.clone()).normalize()
+    }
+  }
+
+  return {
+    type: 'edge',
+    v1: Affine2.transform(transform, feature.v1.clone()),
+    v2: Affine2.transform(transform, feature.v2.clone()),
+    normal: Affine2.transformWithoutTranslation(transform, feature.normal.clone()).normalize()
+  }
 }
 
 export function clipSegment(v1: Vector2, v2: Vector2, normal: Vector2, offset: number, tolerance: number): Vector2[] {
@@ -76,12 +93,11 @@ export function buildContactsFromFeatures(
 }
 
 export function getPolygonFeature(vertices: Vector2[], direction: Vector2): Feature {
-  const centroid = getPolygonCentroid(vertices)
-  let best = createPolygonEdge(vertices, 0, centroid)
+  let best = createPolygonEdge(vertices, 0)
   let bestDot = Vector2.dot(best.normal, direction)
 
   for (let i = 1; i < vertices.length; i++) {
-    const edge = createPolygonEdge(vertices, i, centroid)
+    const edge = createPolygonEdge(vertices, i)
     const projection = Vector2.dot(edge.normal, direction)
 
     if (projection > bestDot) {
@@ -235,8 +251,7 @@ function getPointAlongNormal(depth: number, feature: Feature, normal: Vector2): 
 
 function createPolygonEdge(
   vertices: Vector2[],
-  index: number,
-  centroid: Vector2
+  index: number
 ): Extract<Feature, { type: 'edge' }> {
   const v1 = vertices[index]
   const v2 = vertices[(index + 1) % vertices.length]
@@ -244,7 +259,7 @@ function createPolygonEdge(
   let normal = new Vector2(edge.y, -edge.x).normalize()
   const midpoint = Vector2.add(v1, v2).multiplyScalar(0.5)
 
-  if (Vector2.dot(normal, Vector2.subtract(centroid, midpoint)) > 0) {
+  if (Vector2.dot(normal, midpoint) < 0) {
     normal = normal.reverse()
   }
 
@@ -254,16 +269,6 @@ function createPolygonEdge(
     v2: v2.clone(),
     normal
   }
-}
-
-function getPolygonCentroid(vertices: Vector2[]): Vector2 {
-  const centroid = new Vector2()
-
-  for (let i = 0; i < vertices.length; i++) {
-    centroid.add(vertices[i])
-  }
-
-  return centroid.multiplyScalar(1 / vertices.length)
 }
 
 function dedupeContacts(contacts: Contact2D[], tolerance: number): Contact2D[] {

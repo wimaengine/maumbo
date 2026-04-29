@@ -1,6 +1,6 @@
 import { Affine2, Vector2 } from "hisabati"
 import type { SupportPoint } from "../GJK"
-import type { SupportMapped2d } from "../clipping"
+import { type SupportMapped2d } from "../clipping"
 import type { EPAResult } from "./structs"
 
 const EPA_MAX_ITERATIONS = 32
@@ -132,7 +132,12 @@ function support(
   direction: Vector2
 ): SupportPoint<Vector2> {
   const pointA = shapeA.getSupportPoint2d(direction)
-  const pointB = shapeB.getSupportPoint2d(direction.clone().reverse(), transform)
+  const pointB = Affine2.transform(
+    transform,
+    shapeB.getSupportPoint2d(
+      Affine2.transformWithoutTranslation(transform, direction.clone().reverse())
+    )
+  )
 
   return {
     point: Vector2.subtract(pointA, pointB),

@@ -1,4 +1,4 @@
-import { Affine2, Vector2, fuzzyEqual } from 'hisabati'
+import { Vector2, fuzzyEqual } from 'hisabati'
 import { getPolygonFeature, type Feature, type SupportMapped2d } from '../../core'
 import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
 
@@ -15,16 +15,12 @@ export class ConvexPolygon implements SupportMapped2d, Boundable2D {
     return this.points
   }
 
-  getSupportPoint2d(direction: Vector2, transform?: Affine2): Vector2 {
+  getSupportPoint2d(direction: Vector2): Vector2 {
     let maxDot = -Infinity
-    let support = transform
-      ? transform.transform(this.points[0].clone())
-      : this.points[0].clone()
+    let support = this.points[0].clone()
 
     for (let i = 0; i < this.points.length; i++) {
-      const point = transform
-        ? transform.transform(this.points[i].clone())
-        : this.points[i]
+      const point = this.points[i]
       const projection = Vector2.dot(point, direction)
 
       if (projection > maxDot) {
@@ -36,12 +32,8 @@ export class ConvexPolygon implements SupportMapped2d, Boundable2D {
     return support.clone()
   }
 
-  getFeature2d(direction: Vector2, transform?: Affine2): Feature {
-    const vertices = transform
-      ? this.points.map((point) => transform.transform(point.clone()))
-      : this.points.map((point) => point.clone())
-
-    return getPolygonFeature(vertices, direction)
+  getFeature2d(direction: Vector2): Feature {
+    return getPolygonFeature(this.points, direction)
   }
 
   aabb2d(): BoundingBox2D {

@@ -1,5 +1,5 @@
-import { Vector2, type Affine2 } from "hisabati"
-import type { SupportMapped2d } from "../clipping"
+import { Affine2, Vector2 } from "hisabati"
+import { type SupportMapped2d } from "../clipping"
 import type { SupportPoint } from "./structs"
 import { perpendicularToward, tripleProduct } from "../utils"
 
@@ -92,7 +92,12 @@ function support(
   direction: Vector2
 ): SupportPoint<Vector2> {
   const pointA = shapeA.getSupportPoint2d(direction)
-  const pointB = shapeB.getSupportPoint2d(direction.clone().reverse(), transform)
+  const pointB = Affine2.transform(
+    transform,
+    shapeB.getSupportPoint2d(
+      Affine2.transformWithoutTranslation(transform, direction.clone().reverse())
+    )
+  )
 
   return {
     point: Vector2.subtract(pointA, pointB),

@@ -1,6 +1,11 @@
 import { Affine2, Vector2 } from 'hisabati'
 import { Contact2D } from './contact.js'
-import { buildContactsFromFeatures, buildPointPointContact, type SupportMapped2d } from './clipping.js'
+import {
+  buildContactsFromFeatures,
+  buildPointPointContact,
+  transformFeature2d,
+  type SupportMapped2d
+} from './clipping.js'
 import { GJK2d } from './GJK'
 import { EPA2d } from './EPA'
 
@@ -29,7 +34,12 @@ export function GJKandEPA2d(
 
   let contacts = buildContactsFromFeatures(
     shapeA.getFeature2d(epa.normal),
-    shapeB.getFeature2d(epa.normal.clone().reverse(), transform),
+    transformFeature2d(
+      shapeB.getFeature2d(
+        Affine2.transformWithoutTranslation(transform, epa.normal.clone().reverse())
+      ),
+      transform
+    ),
     epa.normal,
     epa.depth,
     CONTACT_TOLERANCE
@@ -38,7 +48,12 @@ export function GJKandEPA2d(
   if (!contacts.length) {
     contacts = buildPointPointContact(
       shapeA.getSupportPoint2d(epa.normal),
-      shapeB.getSupportPoint2d(epa.normal.clone().reverse(), transform),
+      Affine2.transform(
+        transform,
+        shapeB.getSupportPoint2d(
+          Affine2.transformWithoutTranslation(transform, epa.normal.clone().reverse())
+        )
+      ),
       epa.normal,
       epa.depth
     )
@@ -52,4 +67,3 @@ export function GJKandEPA2d(
 
   return contacts
 }
-
