@@ -10,9 +10,9 @@ export class Line2 implements Boundable2D {
   aabb2d(): BoundingBox2D {
     return new BoundingBox2D(
       -this.halfLength,
-      -this.halfLength,
+      0,
       this.halfLength,
-      this.halfLength
+      0
     )
   }
   boundingCircle(): BoundingCircle {

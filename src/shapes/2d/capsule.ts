@@ -99,7 +99,7 @@ export class Capsule implements SupportMapped2d, Boundable2D {
 
   aabb2d(): BoundingBox2D {
     return new BoundingBox2D(
-      -this.radius
+      -this.radius,
       -(this.radius + this.halfHeight),
       this.radius,
       (this.radius + this.halfHeight)

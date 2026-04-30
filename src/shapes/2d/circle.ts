@@ -56,8 +56,8 @@ export class Circle implements Boundable2D, SupportMapped2d {
 
   aabb2d(): BoundingBox2D {
     return new BoundingBox2D(
-      -this.radius
-      - this.radius,
+      -this.radius,
+      -this.radius,
       this.radius,
       this.radius
     )
