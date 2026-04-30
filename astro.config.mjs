@@ -12,7 +12,7 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        "webgllis": path.resolve("./src"),
+        "Maumbo": path.resolve("./src"),
         // Allow Vite to bundle examples in dev without relying on an import map.
         "maumbo": path.resolve("./src/index.ts"),
         "@examples/utils": path.resolve("./website/vendor/canvas2d.js"),
