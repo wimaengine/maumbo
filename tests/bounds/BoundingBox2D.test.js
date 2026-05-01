@@ -1,5 +1,6 @@
 import test from "node:test"
 import { strictEqual } from "node:assert"
+import { Affine2, Rotary, Vector2 } from "hisabati"
 import { BoundingBox2D } from "../../dist/index.module.js"
 
 test("BoundingBox2D: constructor initializes min and max", () => {
@@ -69,6 +70,35 @@ test("BoundingBox2D: static translate supports an explicit output", () => {
   strictEqual(out.min.y, 8)
   strictEqual(out.max.x, 8)
   strictEqual(out.max.y, 10)
+})
+
+test("BoundingBox2D: instance transform rebuilds extents from rotated corners", () => {
+  const bounds = new BoundingBox2D(-2, -1, 2, 1)
+  const transform = new Affine2()
+    .rotate(Rotary.fromAngle(Math.PI * 0.5))
+    .translate(new Vector2(5, 6))
+  const result = bounds.transform(transform)
+
+  strictEqual(result, undefined)
+  strictEqual(bounds.min.x, 4)
+  strictEqual(bounds.min.y, 4)
+  strictEqual(bounds.max.x, 6)
+  strictEqual(bounds.max.y, 8)
+})
+
+test("BoundingBox2D: static transform supports an explicit output", () => {
+  const source = new BoundingBox2D(-2, -1, 2, 1)
+  const transform = new Affine2()
+    .rotate(Rotary.fromAngle(Math.PI * 0.5))
+    .translate(new Vector2(5, 6))
+  const out = new BoundingBox2D()
+  const result = BoundingBox2D.transform(source, transform, out)
+
+  strictEqual(result, out)
+  strictEqual(out.min.x, 4)
+  strictEqual(out.min.y, 4)
+  strictEqual(out.max.x, 6)
+  strictEqual(out.max.y, 8)
 })
 
 test("BoundingBox2D: union spans both input boxes", () => {

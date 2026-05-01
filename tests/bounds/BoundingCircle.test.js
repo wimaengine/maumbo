@@ -1,5 +1,6 @@
 import test from "node:test"
 import { strictEqual } from "node:assert"
+import { Affine2, Vector2 } from "hisabati"
 import { BoundingCircle } from "../../dist/index.module.js"
 
 test("BoundingCircle: constructor initializes position and radius", () => {
@@ -51,4 +52,31 @@ test("BoundingCircle: static copy supports an explicit output", () => {
   strictEqual(out.position.x, 1)
   strictEqual(out.position.y, 2)
   strictEqual(out.radius, 3)
+})
+
+test("BoundingCircle: instance transform updates position and scales radius", () => {
+  const circle = new BoundingCircle(1, 2, 3)
+  const transform = new Affine2()
+    .scale(new Vector2(2, 4))
+    .translate(new Vector2(5, 6))
+  const result = circle.transform(transform)
+
+  strictEqual(result, undefined)
+  strictEqual(circle.position.x, 7)
+  strictEqual(circle.position.y, 14)
+  strictEqual(circle.radius, 12)
+})
+
+test("BoundingCircle: static transform supports an explicit output", () => {
+  const source = new BoundingCircle(1, 2, 3)
+  const transform = new Affine2()
+    .scale(new Vector2(2, 4))
+    .translate(new Vector2(5, 6))
+  const out = new BoundingCircle()
+  const result = BoundingCircle.transform(source, transform, out)
+
+  strictEqual(result, out)
+  strictEqual(out.position.x, 7)
+  strictEqual(out.position.y, 14)
+  strictEqual(out.radius, 12)
 })

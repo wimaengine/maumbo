@@ -1,6 +1,6 @@
 import test from "node:test"
 import { strictEqual } from "node:assert"
-import { Vector3 } from "hisabati"
+import { Affine3, Vector3 } from "hisabati"
 import { BoundingSphere } from "../../dist/index.module.js"
 
 test("BoundingSphere: constructor initializes position and radius", () => {
@@ -57,4 +57,33 @@ test("BoundingSphere: static copy supports an explicit output", () => {
   strictEqual(out.position.y, 2)
   strictEqual(out.position.z, 3)
   strictEqual(out.radius, 4)
+})
+
+test("BoundingSphere: instance transform updates position and scales radius", () => {
+  const sphere = new BoundingSphere(1, 2, 3, 4)
+  const transform = new Affine3()
+    .scale(new Vector3(2, 3, 5))
+    .translate(new Vector3(7, 11, 13))
+  const result = sphere.transform(transform)
+
+  strictEqual(result, undefined)
+  strictEqual(sphere.position.x, 9)
+  strictEqual(sphere.position.y, 17)
+  strictEqual(sphere.position.z, 28)
+  strictEqual(sphere.radius, 20)
+})
+
+test("BoundingSphere: static transform supports an explicit output", () => {
+  const source = new BoundingSphere(1, 2, 3, 4)
+  const transform = new Affine3()
+    .scale(new Vector3(2, 3, 5))
+    .translate(new Vector3(7, 11, 13))
+  const out = new BoundingSphere()
+  const result = BoundingSphere.transform(source, transform, out)
+
+  strictEqual(result, out)
+  strictEqual(out.position.x, 9)
+  strictEqual(out.position.y, 17)
+  strictEqual(out.position.z, 28)
+  strictEqual(out.radius, 20)
 })

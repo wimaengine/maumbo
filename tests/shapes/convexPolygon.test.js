@@ -1,9 +1,9 @@
 import test from "node:test"
 import { deepStrictEqual, strictEqual } from "node:assert"
 import { Vector2, fuzzyEqual } from "hisabati"
-import { ConvexPolygon, Shape2 } from "../../dist/index.module.js"
+import { ConvexPolygon } from "../../dist/index.module.js"
 
-test("ConvexPolygon stores points and normals and extends Shape2", () => {
+test("ConvexPolygon stores points and normals", () => {
   const points = [
     new Vector2(-1, -1),
     new Vector2(1, -1),
@@ -21,7 +21,6 @@ test("ConvexPolygon stores points and normals and extends Shape2", () => {
   strictEqual(polygon.points, points)
   strictEqual(polygon.normals, normals)
   deepStrictEqual(polygon.getPoints(), points)
-  strictEqual(polygon instanceof Shape2, true)
 })
 
 test("ConvexPolygon.fromPoints keeps the original points", () => {

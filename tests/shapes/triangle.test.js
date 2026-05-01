@@ -1,7 +1,7 @@
 import test from "node:test"
 import { deepStrictEqual, strictEqual } from "node:assert"
 import { Vector2 } from "hisabati"
-import { Shape2, Triangle } from "../../dist/index.module.js"
+import { Triangle } from "../../dist/index.module.js"
 
 test("Triangle stores dimensions and default baseRatio", () => {
   const triangle = new Triangle(2, 3)
@@ -9,7 +9,6 @@ test("Triangle stores dimensions and default baseRatio", () => {
   strictEqual(triangle.halfBase, 2)
   strictEqual(triangle.halfHeight, 3)
   strictEqual(triangle.baseRatio, 0)
-  strictEqual(triangle instanceof Shape2, true)
 })
 
 test("Triangle.getPoints uses baseRatio for the apex", () => {

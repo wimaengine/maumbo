@@ -1,13 +1,12 @@
 import test from "node:test"
 import { deepStrictEqual, ok, strictEqual } from "node:assert"
 import { Vector2, fuzzyEqual } from "hisabati"
-import { Circle, Shape2 } from "../../dist/index.module.js"
+import { Circle } from "../../dist/index.module.js"
 
-test("Circle stores radius and extends Shape2", () => {
+test("Circle stores radius", () => {
   const circle = new Circle(3)
 
   strictEqual(circle.radius, 3)
-  strictEqual(circle instanceof Shape2, true)
 })
 
 test("Circle.getVertices returns support points along the given axis", () => {
@@ -32,4 +31,14 @@ test("Circle.getPoints returns evenly spaced points on the perimeter", () => {
   ok(fuzzyEqual(points[2].y, 0, 1e-12))
   ok(fuzzyEqual(points[3].x, 0, 1e-12))
   ok(fuzzyEqual(points[3].y, -2))
+})
+
+test("Circle.aabb2d wraps the full circle", () => {
+  const circle = new Circle(2)
+  const aabb = circle.aabb2d()
+
+  strictEqual(aabb.min.x, -2)
+  strictEqual(aabb.min.y, -2)
+  strictEqual(aabb.max.x, 2)
+  strictEqual(aabb.max.y, 2)
 })

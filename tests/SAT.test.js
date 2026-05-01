@@ -1,7 +1,7 @@
 import test, { describe } from "node:test"
 import { deepStrictEqual, ok, strictEqual } from "node:assert"
 import { Vector2, Affine2, fuzzyEqual } from "hisabati"
-import { SAT2d, Contact2D } from "../dist/index.module.js"
+import { SAT2d, Contact2D, projectShapesToAxes } from "../dist/index.module.js"
 
 describe("Testing SAT contact point generation", (suite)=>{
   test("Contact on one point", () => {
@@ -121,5 +121,29 @@ describe("Testing SAT contact point generation", (suite)=>{
     ok(fuzzyEqual(contacts[1].normalB.x, 0.24253562503633297))
     ok(fuzzyEqual(contacts[1].normalB.y, 0.9701425001453319))
     strictEqual(contacts[1].depth, 1.0307764064044151)
+  })
+
+  test("projectShapesToAxes: can keep scanning to find the closest separating axis", () => {
+    const pointsA = [
+      new Vector2(-1, -1),
+      new Vector2(1, -1),
+      new Vector2(1, 1),
+      new Vector2(-1, 1),
+    ]
+    const pointsB = [
+      new Vector2(3, -0.5),
+      new Vector2(5, -0.5),
+      new Vector2(5, 0.5),
+      new Vector2(3, 0.5),
+    ]
+    const axes = [
+      new Vector2(1, 0),
+      new Vector2(0, 1),
+    ]
+
+    const result = projectShapesToAxes(pointsA, pointsB, axes, false)
+
+    deepStrictEqual(result.axis, new Vector2(1, 0))
+    strictEqual(result.overlap, -2)
   })
 })

@@ -1,10 +1,19 @@
 import test from "node:test"
 import { strictEqual } from "node:assert"
-import { Line2, Shape2 } from "../../dist/index.module.js"
+import { Line2 } from "../../dist/index.module.js"
 
-test("Line2 stores halfLength and extends Shape2", () => {
+test("Line2 stores halfLength", () => {
   const line = new Line2(5)
 
   strictEqual(line.halfLength, 5)
-  strictEqual(line instanceof Shape2, true)
+})
+
+test("Line2.aabb2d matches the horizontal segment extents", () => {
+  const line = new Line2(5)
+  const aabb = line.aabb2d()
+
+  strictEqual(aabb.min.x, -5)
+  strictEqual(aabb.min.y, 0)
+  strictEqual(aabb.max.x, 5)
+  strictEqual(aabb.max.y, 0)
 })
