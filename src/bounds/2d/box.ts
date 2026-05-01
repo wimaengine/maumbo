@@ -71,9 +71,26 @@ export class BoundingBox2D {
 
   /**
    */
-  static transform(bound:BoundingBox2D, transform:Affine2, out: BoundingBox2D) {
-    Affine2.transform(transform,bound.min,out.min)
-    Affine2.transform(transform,bound.max,out.max)
+  static transform(bound:BoundingBox2D, transform:Affine2, out = new BoundingBox2D()) {
+    const min = Affine2.transform(transform, bound.min.clone())
+    const maxXMinY = Affine2.transform(transform, new Vector2(bound.max.x, bound.min.y))
+    const max = Affine2.transform(transform, bound.max.clone())
+    const minXMaxY = Affine2.transform(transform, new Vector2(bound.min.x, bound.max.y))
+
+    let outMinX = min.x
+    let outMinY = min.y
+    let outMaxX = min.x
+    let outMaxY = min.y
+
+    outMinX = Math.min(outMinX, maxXMinY.x, max.x, minXMaxY.x)
+    outMinY = Math.min(outMinY, maxXMinY.y, max.y, minXMaxY.y)
+    outMaxX = Math.max(outMaxX, maxXMinY.x, max.x, minXMaxY.x)
+    outMaxY = Math.max(outMaxY, maxXMinY.y, max.y, minXMaxY.y)
+
+    out.min.x = outMinX
+    out.min.y = outMinY
+    out.max.x = outMaxX
+    out.max.y = outMaxY
 
     return out
   }
