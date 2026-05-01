@@ -14,7 +14,6 @@ import {
 import { Affine2, Rotary, Vector2 } from 'hisabati'
 import { Color } from 'marangi'
 
-const GRID_COLOR = new Color(0.14, 0.14, 0.14, 1)
 const SHAPE_COLOR = Color.WHITE
 const BOUNDS_COLOR = Color.CYAN
 const AXIS_LENGTH = 24
@@ -65,9 +64,7 @@ canvas2d.start(drawScene)
  * @param {number} time
  */
 function drawScene(gizmo, time) {
-  gizmo
-    .reset()
-    .grid(new Vector2(24, 16), new Vector2(80, 80), GRID_COLOR)
+  gizmo.reset()
 
   for (let i = 0; i < examples.length; i++) {
     const entry = examples[i]

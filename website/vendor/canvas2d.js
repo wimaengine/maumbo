@@ -466,6 +466,9 @@ export class Canvas2D {
     this.activePointers = new Map()
     this.lastPinchDistance = 0
     this.lastPinchCenter = new Vector2()
+    this.gridEnabled = true
+    this.gridSpacing = new Vector2(80, 80)
+    this.gridColor = new Color(0.14, 0.14, 0.14, 1)
 
     this.container.style.position = 'relative'
     this.container.style.width = '100vw'
@@ -736,6 +739,7 @@ export class Canvas2D {
     }
 
     this.clear()
+    this.drawInfiniteGrid()
     this.gizmo.reset()
 
     for (const draw of this.draws) {
@@ -750,6 +754,53 @@ export class Canvas2D {
     this.context.restore()
 
     this.rafId = requestAnimationFrame(this.loop)
+    return this
+  }
+
+  drawInfiniteGrid() {
+    if (!this.gridEnabled) {
+      return this
+    }
+
+    const { x: spacingX, y: spacingY } = this.gridSpacing
+
+    if (spacingX <= 0 || spacingY <= 0) {
+      return this
+    }
+
+    const left = -this.camera.x / this.zoom
+    const right = (this.width - this.camera.x) / this.zoom
+    const top = -this.camera.y / this.zoom
+    const bottom = (this.height - this.camera.y) / this.zoom
+    const startX = Math.floor(left / spacingX) * spacingX
+    const endX = Math.ceil(right / spacingX) * spacingX
+    const startY = Math.floor(top / spacingY) * spacingY
+    const endY = Math.ceil(bottom / spacingY) * spacingY
+    const color = `rgba(${this.gridColor.r * 255},${this.gridColor.g * 255},${this.gridColor.b * 255},${this.gridColor.a})`
+
+    this.context.save()
+    this.context.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0)
+    this.context.translate(this.camera.x, this.camera.y)
+    this.context.scale(this.zoom, this.zoom)
+    this.context.strokeStyle = color
+    this.context.lineWidth = 1 / this.zoom
+
+    for (let x = startX; x <= endX; x += spacingX) {
+      this.context.beginPath()
+      this.context.moveTo(x, top)
+      this.context.lineTo(x, bottom)
+      this.context.stroke()
+    }
+
+    for (let y = startY; y <= endY; y += spacingY) {
+      this.context.beginPath()
+      this.context.moveTo(left, y)
+      this.context.lineTo(right, y)
+      this.context.stroke()
+    }
+
+    this.context.restore()
+
     return this
   }
 
