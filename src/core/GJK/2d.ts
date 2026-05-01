@@ -9,10 +9,11 @@ export function GJK2d(
   shapeA: SupportMapped2d,
   shapeB: SupportMapped2d,
   transform: Affine2,
+  invTransform: Affine2,
   position: Vector2
 ): SupportPoint<Vector2>[] | undefined {
   let direction = position.magnitudeSquared() === 0 ? Vector2.X.clone() : position.clone()
-  const simplex = [support(shapeA, shapeB, transform, direction)]
+  const simplex = [support(shapeA, shapeB, transform, invTransform, direction)]
 
   direction = simplex[0].point.clone().reverse()
 
@@ -21,7 +22,7 @@ export function GJK2d(
       direction = Vector2.X.clone()
     }
 
-    const point = support(shapeA, shapeB, transform, direction)
+    const point = support(shapeA, shapeB, transform, invTransform, direction)
 
     if (Vector2.dot(point.point, direction) < 0) {
       return undefined
@@ -89,13 +90,14 @@ function support(
   shapeA: SupportMapped2d,
   shapeB: SupportMapped2d,
   transform: Affine2,
+  invTransform: Affine2,
   direction: Vector2
 ): SupportPoint<Vector2> {
   const pointA = shapeA.getSupportPoint2d(direction)
   const pointB = Affine2.transform(
     transform,
     shapeB.getSupportPoint2d(
-      Affine2.transformWithoutTranslation(transform, direction.clone().reverse())
+      Affine2.transformWithoutTranslation(invTransform, direction.clone().reverse())
     )
   )
 

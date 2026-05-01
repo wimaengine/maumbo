@@ -256,12 +256,7 @@ function createPolygonEdge(
   const v1 = vertices[index]
   const v2 = vertices[(index + 1) % vertices.length]
   const edge = Vector2.subtract(v2, v1)
-  let normal = new Vector2(edge.y, -edge.x).normalize()
-  const midpoint = Vector2.add(v1, v2).multiplyScalar(0.5)
-
-  if (Vector2.dot(normal, midpoint) < 0) {
-    normal = normal.reverse()
-  }
+  const normal = new Vector2(edge.y, -edge.x).normalize()
 
   return {
     type: 'edge',

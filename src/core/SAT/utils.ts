@@ -2,7 +2,7 @@ import { Vector2 } from "hisabati"
 import type { Circle } from "../../shapes"
 import { SATProjection, SATStructure } from "./structs"
 import type { Contact2D } from "../contact"
-import { buildContactsFromFeatures, getPolygonFeature } from "../clipping"
+import { buildContactsFromFeatures, getPolygonFeature, type Feature } from "../clipping"
 
  /**
  * @param {Vector2[]} verticesA
@@ -24,6 +24,23 @@ export function getContacts(
 
   const featureA = getPolygonFeature(verticesA, axis)
   const featureB = getPolygonFeature(verticesB, axis.clone().reverse())
+  const contacts = buildContactsFromFeatures(featureA, featureB, axis, results.overlap, 0)
+
+  return contacts.length ? contacts : undefined
+}
+
+export function getFeatureContacts(
+  featureA: Feature,
+  featureB: Feature,
+  results: SATStructure,
+  position: Vector2
+): Contact2D[] | undefined {
+  const axis = results.axis.clone()
+
+  if (axis.dot(position) < 0) {
+    axis.reverse()
+  }
+
   const contacts = buildContactsFromFeatures(featureA, featureB, axis, results.overlap, 0)
 
   return contacts.length ? contacts : undefined

@@ -1,5 +1,6 @@
 import { Affine2, invert, Vector2 } from "hisabati"
-import { getContacts, projectCircleToAxis, projectVerticesToAxis } from "./utils"
+import { getFeatureContacts, projectCircleToAxis, projectVerticesToAxis } from "./utils"
+import { getPolygonFeature } from "../clipping"
 import { SATStructure } from "./structs"
 import type { Circle } from "../../shapes"
 import type { Contact2D } from "../contact"
@@ -26,9 +27,15 @@ export function sat2dCircle(
 
   if (!results) return undefined
 
-  const verticesA = circle.getVertices(results.axis)
-
-  const contacts = getContacts(verticesA, vertices, results, position)
+  const axis = results.axis.dot(position) < 0
+    ? results.axis.clone().reverse()
+    : results.axis.clone()
+  const contacts = getFeatureContacts(
+    circle.getFeature2d(axis),
+    getPolygonFeature(vertices, axis.clone().reverse()),
+    results,
+    position
+  )
 
   if (contacts) {
     contacts.map((contact) => {
@@ -77,4 +84,3 @@ function projectCircleVerticesToAxes(
 
   return point
 }
-

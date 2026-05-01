@@ -20,13 +20,13 @@ export function GJKandEPA2d(
   transform: Affine2,
   invTransform: Affine2
 ): Contact2D[] | undefined {
-  const simplex = GJK2d(shapeA, shapeB, transform, new Vector2(transform.x, transform.y))
+  const simplex = GJK2d(shapeA, shapeB, transform, invTransform, new Vector2(transform.x, transform.y))
 
   if (!simplex) {
     return undefined
   }
 
-  const epa = EPA2d(simplex, shapeA, shapeB, transform, new Vector2(transform.x, transform.y))
+  const epa = EPA2d(simplex, shapeA, shapeB, transform, invTransform, new Vector2(transform.x, transform.y))
 
   if (!epa) {
     return undefined
@@ -36,7 +36,7 @@ export function GJKandEPA2d(
     shapeA.getFeature2d(epa.normal),
     transformFeature2d(
       shapeB.getFeature2d(
-        Affine2.transformWithoutTranslation(transform, epa.normal.clone().reverse())
+        Affine2.transformWithoutTranslation(invTransform, epa.normal.clone().reverse())
       ),
       transform
     ),
@@ -51,7 +51,7 @@ export function GJKandEPA2d(
       Affine2.transform(
         transform,
         shapeB.getSupportPoint2d(
-          Affine2.transformWithoutTranslation(transform, epa.normal.clone().reverse())
+          Affine2.transformWithoutTranslation(invTransform, epa.normal.clone().reverse())
         )
       ),
       epa.normal,

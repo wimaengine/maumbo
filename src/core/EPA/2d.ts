@@ -11,6 +11,7 @@ export function EPA2d(
   shapeA: SupportMapped2d,
   shapeB: SupportMapped2d,
   transform: Affine2,
+  invTransform: Affine2,
   position: Vector2
 ): EPAResult<Vector2> | undefined {
   const polytope = ensureCounterClockwise(simplex.map(copySupportPoint))
@@ -25,7 +26,7 @@ export function EPA2d(
     const alignedNormal = Vector2.dot(edge.normal, position) < 0
       ? edge.normal.clone().reverse()
       : edge.normal
-    const point = support(shapeA, shapeB, transform, alignedNormal)
+    const point = support(shapeA, shapeB, transform, invTransform, alignedNormal)
     const distance = Vector2.dot(point.point, alignedNormal)
 
     if (distance - edge.distance <= EPA_TOLERANCE) {
@@ -129,13 +130,14 @@ function support(
   shapeA: SupportMapped2d,
   shapeB: SupportMapped2d,
   transform: Affine2,
+  invTransform: Affine2,
   direction: Vector2
 ): SupportPoint<Vector2> {
   const pointA = shapeA.getSupportPoint2d(direction)
   const pointB = Affine2.transform(
     transform,
     shapeB.getSupportPoint2d(
-      Affine2.transformWithoutTranslation(transform, direction.clone().reverse())
+      Affine2.transformWithoutTranslation(invTransform, direction.clone().reverse())
     )
   )
 
