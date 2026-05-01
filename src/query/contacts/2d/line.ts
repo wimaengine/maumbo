@@ -1,12 +1,11 @@
 import { Affine2, Vector2 } from 'hisabati'
-import { Contact2D } from '../../../core/contact.js'
-import { Capsule, ConvexPolygon, Line2, Rectangle, Triangle } from '../../../shapes'
-
+import { Contact2D, GJKandEPA2d, SAT2d } from '../../../core'
+import { Capsule, Circle, ConvexPolygon, Line2, Rectangle, Triangle } from '../../../shapes'
 
 /**
  * @param {Line2} a
  * @param {Line2} b
- * @param {Affine2} transform 
+ * @param {Affine2} transform
  * @param {Affine2} invTransform
  */
 export function linesContact(
@@ -46,6 +45,7 @@ export function linesContact(
     s = Math.max(0, Math.min(1, -Vector2.dot(da, r) / aLenSq))
   } else {
     const denom = aLenSq * bLenSq - ab * ab
+
     if (Math.abs(denom) < EPS) {
       s = 0
       t = Math.max(0, Math.min(1, Vector2.dot(db, r) / bLenSq))
@@ -64,12 +64,16 @@ export function linesContact(
   const delta = Vector2.subtract(closestA, closestB)
   const distSq = Vector2.dot(delta, delta)
 
-  if (distSq > EPS * EPS) return undefined
+  if (distSq > EPS * EPS) {
+    return undefined
+  }
 
   let normalB = new Vector2(db.y, -db.x)
+
   if (normalB.magnitudeSquared() < EPS) {
     normalB = new Vector2(da.y, -da.x)
   }
+
   normalB.normalize()
 
   const normalA = Affine2
@@ -97,6 +101,21 @@ export function linesContact(
 
 /**
  * @param {Line2} a
+ * @param {Circle} b
+ * @param {Affine2} transform
+ * @param {Affine2} invTransform
+ */
+export function lineCircleContact(
+  a: Line2,
+  b: Circle,
+  transform: Affine2,
+  invTransform: Affine2
+): Contact2D[] | undefined {
+  return GJKandEPA2d(a, b, transform, invTransform)
+}
+
+/**
+ * @param {Line2} a
  * @param {Rectangle} b
  * @param {Affine2} transform
  * @param {Affine2} invTransform
@@ -106,76 +125,19 @@ export function lineRectangleContact(
   b: Rectangle,
   transform: Affine2,
   invTransform: Affine2
-): Contact2D | undefined {
-  const a0Local = new Vector2(a.halfLength, 0)
-  const a1Local = new Vector2(-a.halfLength, 0)
-  const p0 = Affine2.transform(invTransform, a0Local)
-  const p1 = Affine2.transform(invTransform, a1Local)
+): Contact2D[] | undefined {
+  const pointsA = [
+    new Vector2(-a.halfLength, 0),
+    new Vector2(a.halfLength, 0)
+  ]
+  const pointsB = b.getPoints().map((point) => Affine2.transform(transform, point))
+  const axes = [
+    Vector2.Y.clone(),
+    Vector2.normal(Vector2.subtract(pointsB[0], pointsB[1])).normalize(),
+    Vector2.normal(Vector2.subtract(pointsB[1], pointsB[2])).normalize()
+  ]
 
-  const d = Vector2.subtract(p1, p0)
-
-  let tMin = 0
-  let tMax = 1
-  let hitNormalB: Vector2 | null = null
-
-  for (let axis = 0; axis < 2; axis++) {
-    const origin = axis === 0 ? p0.x : p0.y
-    const direction = axis === 0 ? d.x : d.y
-    const min = axis === 0 ? -b.halfWidth : -b.halfHeight
-    const max = axis === 0 ?  b.halfWidth :  b.halfHeight
-
-    if (Math.abs(direction) < 1e-8) {
-      if (origin < min || origin > max) return undefined
-      continue
-    }
-
-    const invD = 1 / direction
-    let t1 = (min - origin) * invD
-    let t2 = (max - origin) * invD
-
-    let sign = -1
-    if (t1 > t2) {
-      const tmp = t1
-      t1 = t2
-      t2 = tmp
-      sign = 1
-    }
-
-    if (t1 > tMin) {
-      tMin = t1
-      hitNormalB = axis === 0
-        ? new Vector2(sign, 0)
-        : new Vector2(0, sign)
-    }
-
-    tMax = Math.min(tMax, t2)
-    if (tMin > tMax) return undefined
-  }
-
-  const contactB = Vector2.add(p0, Vector2.multiplyScalar(d, tMin))
-  if (hitNormalB === null) return undefined
-  const normalB = hitNormalB
-  const normalA = Affine2
-    .transformWithoutTranslation(transform, normalB)
-    .reverse()
-  const tangentA = Vector2.normal(normalA)
-  const tangentB = Vector2.normal(normalB)
-  const contactA = Vector2.add(
-    a0Local,
-    Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), tMin)
-  )
-
-  const penetration = Math.max(0, tMax - tMin) * d.magnitude()
-
-  return new Contact2D(
-    contactA,
-    contactB,
-    normalA,
-    normalB,
-    penetration,
-    tangentA,
-    tangentB
-  )
+  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
@@ -189,66 +151,20 @@ export function lineTriangleContact(
   b: Triangle,
   transform: Affine2,
   invTransform: Affine2
-): Contact2D | undefined {
-  const a0Local = new Vector2(a.halfLength, 0)
-  const a1Local = new Vector2(-a.halfLength, 0)
-  const p0 = Affine2.transform(invTransform, a0Local)
-  const p1 = Affine2.transform(invTransform, a1Local)
-  const d = Vector2.subtract(p1, p0)
+): Contact2D[] | undefined {
+  const pointsA = [
+    new Vector2(-a.halfLength, 0),
+    new Vector2(a.halfLength, 0)
+  ]
+  const pointsB = b.getPoints().map((point) => Affine2.transform(transform, point))
+  const axes = [
+    Vector2.Y.clone(),
+    Vector2.normal(Vector2.subtract(pointsB[0], pointsB[1])).normalize(),
+    Vector2.normal(Vector2.subtract(pointsB[1], pointsB[2])).normalize(),
+    Vector2.normal(Vector2.subtract(pointsB[2], pointsB[0])).normalize()
+  ]
 
-  let bestT = Infinity
-  let bestNormalB: Vector2 | null = null
-  const verts = b.getPoints()
-
-  for (let i = 0; i < 3; i++) {
-    const v0 = verts[i]
-    const v1 = verts[(i + 1) % 3]
-
-    const edge = Vector2.subtract(v1, v0)
-    const edgeNormal = new Vector2(edge.y, -edge.x)
-
-    const denom = Vector2.dot(edgeNormal, d)
-    if (Math.abs(denom) < 1e-8) continue
-
-    const t = Vector2.dot(edgeNormal, Vector2.subtract(v0, p0)) / denom
-    if (t < 0 || t > 1) continue
-
-    const hit = Vector2.add(p0, Vector2.multiplyScalar(d, t))
-    const edgeDir = Vector2.subtract(v1, v0)
-    const toHit = Vector2.subtract(hit, v0)
-    const proj = Vector2.dot(toHit, edgeDir)
-    if (proj < 0 || proj > Vector2.dot(edgeDir, edgeDir)) continue
-
-    if (t < bestT) {
-      bestT = t
-      bestNormalB = edgeNormal.normalize()
-    }
-  }
-
-  if (bestNormalB === null) return undefined
-  const contactB = Vector2.add(p0, Vector2.multiplyScalar(d, bestT))
-  if (bestNormalB === null) return undefined
-  const normalA = Affine2
-    .transformWithoutTranslation(transform, bestNormalB)
-    .reverse()
-  const tangentA = Vector2.normal(normalA)
-  const tangentB = Vector2.normal(bestNormalB)
-  const contactA = Vector2.add(
-    a0Local,
-    Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), bestT)
-  )
-
-  const penetration = 0
-
-  return new Contact2D(
-    contactA,
-    contactB,
-    normalA,
-    bestNormalB,
-    penetration,
-    tangentA,
-    tangentB
-  )
+  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
@@ -262,100 +178,8 @@ export function lineCapsuleContact(
   b: Capsule,
   transform: Affine2,
   invTransform: Affine2
-): Contact2D | undefined {
-  const a0Local = new Vector2(a.halfLength, 0)
-  const a1Local = new Vector2(-a.halfLength, 0)
-  const a0 = Affine2.transform(invTransform, a0Local)
-  const a1 = Affine2.transform(invTransform, a1Local)
-
-  const b0 = new Vector2(0, b.halfHeight)
-  const b1 = new Vector2(0, -b.halfHeight)
-  const r = b.radius
-  const da = Vector2.subtract(a1, a0)
-  const db = Vector2.subtract(b1, b0)
-  const r0 = Vector2.subtract(a0, b0)
-
-  const daLenSq = Vector2.dot(da, da)
-  const dbLenSq = Vector2.dot(db, db)
-  const dab = Vector2.dot(da, db)
-
-  const daLen = daLenSq
-  const e = dbLenSq
-  const f = Vector2.dot(db, r0)
-
-  let s: number
-  let t: number
-
-  const EPS = 1e-8
-  if (daLen <= EPS && e <= EPS) {
-    s = t = 0
-  } else if (daLen <= EPS) {
-    s = 0
-    t = Math.max(0, Math.min(1, f / e))
-  } else {
-    const c = Vector2.dot(da, r0)
-
-    if (e <= EPS) {
-      t = 0
-      s = Math.max(0, Math.min(1, -c / daLen))
-    } else {
-      const denom = daLen * e - dab * dab
-
-      if (denom !== 0) {
-        s = Math.max(0, Math.min(1, (dab * f - c * e) / denom))
-      } else {
-        s = 0
-      }
-
-      t = (dab * s + f) / e
-
-      if (t < 0) {
-        t = 0
-        s = Math.max(0, Math.min(1, -c / daLen))
-      } else if (t > 1) {
-        t = 1
-        s = Math.max(0, Math.min(1, (dab - c) / daLen))
-      }
-    }
-  }
-
-  const closestA = Vector2.add(a0, Vector2.multiplyScalar(da, s))
-  const closestB = Vector2.add(b0, Vector2.multiplyScalar(db, t))
-
-  const delta = Vector2.subtract(closestA, closestB)
-  const distSq = Vector2.dot(delta, delta)
-
-  if (distSq > r * r) return undefined
-
-  const distance = Math.sqrt(distSq)
-  const penetration = r - distance
-  const normalB =
-    distance > EPS ? Vector2.multiplyScalar(delta, 1 / distance)
-                   : Vector2.Y.clone()
-  const contactB = Vector2.add(
-    closestB,
-    Vector2.multiplyScalar(normalB, r)
-  )
-
-  const normalA = Affine2
-    .transformWithoutTranslation(transform, normalB)
-    .reverse()
-  const tangentA = Vector2.normal(normalA)
-  const tangentB = Vector2.normal(normalB)
-  const contactA = Vector2.add(
-    a0Local,
-    Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), s)
-  )
-
-  return new Contact2D(
-    contactA,
-    contactB,
-    normalA,
-    normalB,
-    penetration,
-    tangentA,
-    tangentB
-  )
+): Contact2D[] | undefined {
+  return GJKandEPA2d(a, b, transform, invTransform)
 }
 
 /**
@@ -369,72 +193,16 @@ export function lineConvexPolygonContact(
   b: ConvexPolygon,
   transform: Affine2,
   invTransform: Affine2
-): Contact2D | undefined {
-  const a0Local = new Vector2(a.halfLength, 0)
-  const a1Local = new Vector2(-a.halfLength, 0)
-  const p0 = Affine2.transform(invTransform, a0Local)
-  const p1 = Affine2.transform(invTransform, a1Local)
-  const d = Vector2.subtract(p1, p0)
+): Contact2D[] | undefined {
+  const pointsA = [
+    new Vector2(-a.halfLength, 0),
+    new Vector2(a.halfLength, 0)
+  ]
+  const pointsB = b.points.map((point) => Affine2.transform(transform, point.clone()))
+  const axes = [
+    Vector2.Y.clone(),
+    ...b.normals.map((normal) => Affine2.transformWithoutTranslation(transform, normal))
+  ]
 
-  let tEnter = 0
-  let tExit = 1
-  let enterNormalB: Vector2 | null = null
-
-  const verts = b.getPoints()
-  const count = verts.length
-  const EPS = 1e-8
-
-  for (let i = 0; i < count; i++) {
-    const v0 = verts[i]
-    const v1 = verts[(i + 1) % count]
-
-    const edge = Vector2.subtract(v1, v0)
-    const normal = new Vector2(edge.y, -edge.x).normalize()
-
-    const w = Vector2.subtract(p0, v0)
-    const denom = Vector2.dot(normal, d)
-    const numer = -Vector2.dot(normal, w)
-
-    if (Math.abs(denom) < EPS) {
-      if (numer < 0) return undefined
-      continue
-    }
-
-    const t = numer / denom
-
-    if (denom < 0) {
-      if (t > tEnter) {
-        tEnter = t
-        enterNormalB = normal
-      }
-    } else {
-      tExit = Math.min(tExit, t)
-    }
-
-    if (tEnter > tExit) return undefined
-  }
-  const contactB = Vector2.add(p0, Vector2.multiplyScalar(d, tEnter))
-  const normalB = enterNormalB ?? Vector2.Y.clone()
-  const normalA = Affine2
-    .transformWithoutTranslation(transform, normalB)
-    .reverse()
-  const tangentA = Vector2.normal(normalA)
-  const tangentB = Vector2.normal(normalB)
-
-  const contactA = Vector2.add(
-    a0Local,
-    Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), tEnter)
-  )
-
-  const penetration = 0
-
-  return new Contact2D(
-    contactA,
-    contactB,
-    normalA,
-    normalB,
-    penetration,
-    tangentA,
-    tangentB
-  )
+  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
 }
