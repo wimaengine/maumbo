@@ -56,10 +56,11 @@ export function sat2dCircle(
  * @param {Vector2[]} vertices
  * @param {Vector2[]} axes
  */
-function projectCircleVerticesToAxes(
+export function projectCircleVerticesToAxes(
   circle: Circle,
   vertices: Vector2[],
-  axes: Vector2[]
+  axes: Vector2[],
+  earlyReturn = true
 ): SATStructure | undefined {
   const axis = new Vector2()
   const point = new SATStructure()
@@ -70,8 +71,11 @@ function projectCircleVerticesToAxes(
     const p2 = projectVerticesToAxis(vertices, axis)
     const overlap = Math.min(p1.max - p2.min, p2.max - p1.min)
 
-    if (overlap < 0) return undefined
-    if (overlap < point.overlap) {
+    if (overlap < 0) {
+      if (earlyReturn) return undefined
+    }
+
+    if (Math.abs(overlap) < Math.abs(point.overlap)) {
       Vector2.copy(axis, point.axis)
       point.overlap = overlap
     }
