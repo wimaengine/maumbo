@@ -1,6 +1,6 @@
 import { Vector2 } from 'hisabati'
 import type { Feature, SupportMapped2d } from '../../core'
-import { BoundingBox2D, type Boundable2D, BoundingCircle } from '../../bounds'
+import { BoundingBox2D, type Boundable2D, BoundingCircle, Segment2D } from '../../bounds'
 
 export class Capsule implements SupportMapped2d, Boundable2D {
   radius = 0
@@ -9,6 +9,13 @@ export class Capsule implements SupportMapped2d, Boundable2D {
   constructor(radius: number, halfHeight: number) {
     this.radius = radius
     this.halfHeight = halfHeight
+  }
+
+  getSegment(): Segment2D {
+    return new Segment2D(
+      0, this.halfHeight,
+      0, -this.halfHeight
+    )
   }
 
   getVertices(axis: Vector2): [Vector2, Vector2] {
