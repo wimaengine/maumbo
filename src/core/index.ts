@@ -1,4 +1,7 @@
 export * from './SAT'
+export * from './GJK'
+export * from './EPA'
+export * from './query'
 export * from './contact'
 export * from './clipping'
 export * from './gjkEPA'
