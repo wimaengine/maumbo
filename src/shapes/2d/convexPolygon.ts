@@ -12,7 +12,7 @@ export class ConvexPolygon implements SupportMapped2d, Boundable2D {
   }
 
   getPoints(): Vector2[] {
-    return this.points
+    return this.points.map((p)=>p.clone())
   }
 
   getSupportPoint2d(direction: Vector2): Vector2 {
