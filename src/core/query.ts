@@ -2,6 +2,6 @@ import type { Affine2, Vector2 } from "hisabati";
 
 export interface PointQuery2D {
     queryPointLocal(point: Vector2, tolerance?: number): boolean
-    queryPoint(point: Vector2, transform: Affine2, tolerance?: number): true
+    queryPoint(point: Vector2, transform: Affine2, tolerance?: number): boolean
     queryPointDistance(point: Vector2, tolerance?: number): number
 }
