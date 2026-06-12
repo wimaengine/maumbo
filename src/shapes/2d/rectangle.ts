@@ -1,8 +1,9 @@
-import { Vector2 } from 'hisabati'
+import { Affine2, Vector2 } from 'hisabati'
 import { getPolygonFeature, type Feature, type SupportMapped2d } from '../../core'
 import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
+import type { PointQuery2D } from '../../core/query.js'
 
-export class Rectangle implements SupportMapped2d, Boundable2D {
+export class Rectangle implements SupportMapped2d, Boundable2D, PointQuery2D {
   halfWidth = 0
   halfHeight = 0
 
@@ -60,5 +61,27 @@ export class Rectangle implements SupportMapped2d, Boundable2D {
       0,
       Math.sqrt(halfHeight * halfHeight + halfWidth * halfWidth)
     )
+  }
+
+  queryPointLocal(point: Vector2, tolerance = 0): boolean {
+    return this.queryPointDistance(point, tolerance) <= 0
+  }
+
+  queryPoint(point: Vector2, transform: Affine2, tolerance = 0): boolean {
+    return this.queryPointLocal(
+      Affine2.invert(transform, new Affine2()).transform(point.clone()),
+      tolerance
+    )
+  }
+
+  queryPointDistance(point: Vector2, tolerance = 0): number {
+    const dx = Math.abs(point.x) - this.halfWidth
+    const dy = Math.abs(point.y) - this.halfHeight
+    const outsideX = Math.max(dx, 0)
+    const outsideY = Math.max(dy, 0)
+    const outsideDistance = Math.hypot(outsideX, outsideY)
+    const insideDistance = Math.min(Math.max(dx, dy), 0)
+
+    return outsideDistance + insideDistance - tolerance
   }
 }
