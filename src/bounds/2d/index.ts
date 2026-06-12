@@ -3,6 +3,7 @@ export * from './box'
 export * from './circle'
 export * from './segment'
 export * from './triangle'
+export * from './arc'
 
 import type { BoundingBox2D } from './box'
 import type { BoundingCircle } from './circle'
