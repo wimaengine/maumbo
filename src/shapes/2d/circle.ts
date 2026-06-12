@@ -1,8 +1,9 @@
 import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
-import { Vector2, TAU } from 'hisabati'
+import { Affine2, Vector2, TAU } from 'hisabati'
 import type { Feature, SupportMapped2d } from '../../core/clipping.js'
+import type { PointQuery2D } from '../../core/query.js'
 
-export class Circle implements Boundable2D, SupportMapped2d {
+export class Circle implements Boundable2D, SupportMapped2d, PointQuery2D {
   radius = 0
 
   constructor(radius: number) {
@@ -69,5 +70,20 @@ export class Circle implements Boundable2D, SupportMapped2d {
       0,
       this.radius
     )
+  }
+
+  queryPointLocal(point: Vector2, tolerance = 0): boolean {
+    return this.queryPointDistance(point, tolerance) <= 0
+  }
+
+  queryPoint(point: Vector2, transform: Affine2, tolerance = 0): boolean {
+    return this.queryPointLocal(
+      Affine2.invert(transform, new Affine2()).transform(point.clone()),
+      tolerance
+    )
+  }
+
+  queryPointDistance(point: Vector2, tolerance = 0): number {
+    return point.magnitude() - this.radius - tolerance
   }
 }
