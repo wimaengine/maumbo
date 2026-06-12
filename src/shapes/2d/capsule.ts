@@ -14,8 +14,8 @@ export class Capsule implements SupportMapped2d, Boundable2D, PointQuery2D {
 
   getSegment(): Segment2D {
     return new Segment2D(
-      0, this.halfHeight,
-      0, -this.halfHeight
+      new Vector2(0, this.halfHeight),
+      new Vector2(0, -this.halfHeight)
     )
   }
 

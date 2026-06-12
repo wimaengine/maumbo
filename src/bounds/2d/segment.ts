@@ -19,9 +19,9 @@ export class Segment2D {
    */
   end
 
-  constructor(minX = 0, minY = 0, maxX = 0, maxY = 0) {
-    this.start = new Vector2(minX, minY)
-    this.end = new Vector2(maxX, maxY)
+  constructor(start: Vector2 = new Vector2(), end: Vector2 = new Vector2()) {
+    this.start = start
+    this.end = end
   }
 
   translate(x:number, y:number) {
