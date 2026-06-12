@@ -1,8 +1,9 @@
-import { Vector2 } from 'hisabati'
+import { Affine2, Vector2 } from 'hisabati'
 import type { Feature, SupportMapped2d } from '../../core'
 import { BoundingBox2D, type Boundable2D, BoundingCircle, Segment2D } from '../../bounds'
+import type { PointQuery2D } from '../../core/query.js'
 
-export class Capsule implements SupportMapped2d, Boundable2D {
+export class Capsule implements SupportMapped2d, Boundable2D, PointQuery2D {
   radius = 0
   halfHeight = 0
 
@@ -119,5 +120,32 @@ export class Capsule implements SupportMapped2d, Boundable2D {
       0,
       this.radius + this.halfHeight
     )
+  }
+
+  queryPointLocal(point: Vector2, tolerance = 0): boolean {
+    return this.queryPointDistance(point, tolerance) <= 0
+  }
+
+  queryPoint(point: Vector2, transform: Affine2, tolerance = 0): boolean {
+    return this.queryPointLocal(
+      Affine2.invert(transform, new Affine2()).transform(point.clone()),
+      tolerance
+    )
+  }
+
+  queryPointDistance(point: Vector2, tolerance = 0): number {
+    const start = new Vector2(0, this.halfHeight)
+    const end = new Vector2(0, -this.halfHeight)
+    const edge = Vector2.subtract(end, start)
+    const lengthSq = Vector2.dot(edge, edge)
+
+    if (lengthSq === 0) {
+      return Vector2.distanceTo(point, start) - this.radius - tolerance
+    }
+
+    const t = Math.max(0, Math.min(1, Vector2.dot(Vector2.subtract(point, start), edge) / lengthSq))
+    const closest = Vector2.add(start, Vector2.multiplyScalar(edge, t))
+
+    return Vector2.distanceTo(point, closest) - this.radius - tolerance
   }
 }
