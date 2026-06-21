@@ -1,4 +1,5 @@
 import { Affine2, Vector2 } from 'hisabati'
+import type { Rotary } from 'hisabati'
 
 /**
  * A circular 2d bound.
@@ -12,21 +13,35 @@ export class BoundingCircle {
     this.position = new Vector2(x, y)
   }
 
-  translate(x:number, y:number) {
-    BoundingCircle.translate(this, x, y, this)
+  translate(translation: Vector2) {
+    return BoundingCircle.translate(this, translation, this)
+  }
+
+  rotate(center: Vector2, rotary: Rotary) {
+    return BoundingCircle.rotate(this, center, rotary, this)
   }
 
   transform(affine: Affine2) {
-    BoundingCircle.transform(this, affine, this)
+    return BoundingCircle.transform(this, affine, this)
   }
 
   copy(bound: BoundingCircle) {
     BoundingCircle.copy(bound, this)
   }
 
-  static translate(bound: BoundingCircle, x:number, y:number, out = new BoundingCircle()) {
-    out.position.x = bound.position.x + x
-    out.position.y = bound.position.y + y
+  static translate(bound: BoundingCircle, translation: Vector2, out = new BoundingCircle()) {
+    out.position.x = bound.position.x + translation.x
+    out.position.y = bound.position.y + translation.y
+    out.radius = bound.radius
+
+    return out
+  }
+
+  static rotate(bound: BoundingCircle, center: Vector2, rotary: Rotary, out = new BoundingCircle()) {
+    const relative = Vector2.subtract(bound.position, center, new Vector2())
+
+    Vector2.rotateFast(relative, rotary.cos, rotary.sin, relative)
+    Vector2.add(relative, center, out.position)
     out.radius = bound.radius
 
     return out
@@ -34,7 +49,7 @@ export class BoundingCircle {
 
   static transform(bound: BoundingCircle, affine: Affine2, out = new BoundingCircle()) {
     Affine2.transform(affine, bound.position, out.position)
-    out.radius = bound.radius * getMaxScale2d(affine)
+    out.radius = bound.radius
 
     return out
   }
@@ -43,16 +58,6 @@ export class BoundingCircle {
     out.position.x = bound.position.x
     out.position.y = bound.position.y
     out.radius = bound.radius
-
     return out
   }
-}
-
-function getMaxScale2d(affine: Affine2): number {
-  const { a, b, c, d } = affine
-  const trace = a * a + b * b + c * c + d * d
-  const determinant = a * d - b * c
-  const discriminant = Math.max(0, trace * trace - 4 * determinant * determinant)
-
-  return Math.sqrt(0.5 * (trace + Math.sqrt(discriminant)))
 }
