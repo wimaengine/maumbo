@@ -66,7 +66,7 @@ function triangle1(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(rect1, rect2, transformA, transformB)
+  const intersection = getShape2Intersections(rect1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -77,7 +77,7 @@ function triangle1(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -96,7 +96,7 @@ function triangle2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(rect1, rect2, transformA, transformB)
+  const intersection = getShape2Intersections(rect1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -107,7 +107,7 @@ function triangle2(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -127,7 +127,7 @@ function triangle3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(rect1, rect2, transformA, transformB)
+  const intersection = getShape2Intersections(rect1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -138,7 +138,7 @@ function triangle3(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -158,7 +158,7 @@ function triangle4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(rect1, rect2, transformA, transformB)
+  const intersection = getShape2Intersections(rect1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -169,7 +169,7 @@ function triangle4(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -188,7 +188,7 @@ function triangle5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(rect1, rect2, transformA, transformB)
+  const intersection = getShape2Intersections(rect1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -199,7 +199,7 @@ function triangle5(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -219,7 +219,7 @@ function triangleRectangle1(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, rect2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -230,7 +230,7 @@ function triangleRectangle1(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -249,7 +249,7 @@ function triangleRectangle2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, rect2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -260,7 +260,7 @@ function triangleRectangle2(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -280,7 +280,7 @@ function triangleRectangle3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, rect2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -291,7 +291,7 @@ function triangleRectangle3(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -310,7 +310,7 @@ function triangleRectangle4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, rect2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -321,7 +321,7 @@ function triangleRectangle4(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -340,7 +340,7 @@ function triangleRectangle5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, rect2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -351,7 +351,7 @@ function triangleRectangle5(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -371,7 +371,7 @@ function triangleCircle1(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, circle2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, circle2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -382,7 +382,7 @@ function triangleCircle1(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -401,7 +401,7 @@ function triangleCircle2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, circle2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, circle2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -412,7 +412,7 @@ function triangleCircle2(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -432,7 +432,7 @@ function triangleCircle3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, circle2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, circle2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -443,7 +443,7 @@ function triangleCircle3(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -462,7 +462,7 @@ function triangleCircle4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, circle2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, circle2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -473,7 +473,7 @@ function triangleCircle4(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -492,7 +492,7 @@ function triangleCircle5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, circle2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, circle2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -503,7 +503,7 @@ function triangleCircle5(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -523,7 +523,7 @@ function trianglePolygon1(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, poly2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, poly2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -534,7 +534,7 @@ function trianglePolygon1(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -553,7 +553,7 @@ function trianglePolygon2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, poly2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, poly2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -564,7 +564,7 @@ function trianglePolygon2(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -584,7 +584,7 @@ function trianglePolygon3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, poly2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, poly2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -595,7 +595,7 @@ function trianglePolygon3(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -614,7 +614,7 @@ function trianglePolygon4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, poly2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, poly2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -625,7 +625,7 @@ function trianglePolygon4(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -644,7 +644,7 @@ function trianglePolygon5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersections = getShape2Intersections(tri1, poly2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, poly2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -655,7 +655,7 @@ function trianglePolygon5(gizmo, time) {
     .axes(30)
     .reset()
   
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -675,7 +675,7 @@ function triangleCapsule1(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(tri1, cap2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, cap2, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -686,7 +686,7 @@ function triangleCapsule1(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -705,7 +705,7 @@ function triangleCapsule2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(tri1, cap2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, cap2, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -716,7 +716,7 @@ function triangleCapsule2(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -736,7 +736,7 @@ function triangleCapsule3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(tri1, cap2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, cap2, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -747,7 +747,7 @@ function triangleCapsule3(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -766,7 +766,7 @@ function triangleCapsule4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(tri1, cap2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, cap2, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -777,7 +777,7 @@ function triangleCapsule4(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -796,7 +796,7 @@ function triangleCapsule5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(tri1, cap2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, cap2, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -807,7 +807,7 @@ function triangleCapsule5(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -825,7 +825,7 @@ function triangleLine1(gizmo, time) {
     .translate(new Vector2(45, 0))
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
-  const intersections = getShape2Intersections(tri1, line2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, line2, transformA, transformB)
   gizmo
     .setTransform(transformA)
     .lineStrip(tri1.getPoints(), Color.WHITE)
@@ -834,7 +834,7 @@ function triangleLine1(gizmo, time) {
     .line(new Vector2(-line2.halfLength, 0), new Vector2(line2.halfLength, 0))
     .axes(30)
     .reset()
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -852,7 +852,7 @@ function triangleLine2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(tri1, line2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, line2, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -863,7 +863,7 @@ function triangleLine2(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -883,7 +883,7 @@ function triangleLine3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(tri1, line2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, line2, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -894,7 +894,7 @@ function triangleLine3(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -913,7 +913,7 @@ function triangleLine4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(tri1, line2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, line2, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -924,7 +924,7 @@ function triangleLine4(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -942,7 +942,7 @@ function triangleLine5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(tri1, line2, transformA, transformB)
+  const intersection = getShape2Intersections(tri1, line2, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -953,5 +953,5 @@ function triangleLine5(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }

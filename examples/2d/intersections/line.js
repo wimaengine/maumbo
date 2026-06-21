@@ -97,7 +97,7 @@ function createDemo(shapeA, shapeB, x, y, variant, offset) {
     const elapsed = time * 0.001
     const center = new Vector2(x, y)
     const [transformA, transformB] = createTransforms(center, elapsed, variant, offset)
-    const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+    const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
     gizmo
       .setTransform(transformA)
@@ -110,7 +110,7 @@ function createDemo(shapeA, shapeB, x, y, variant, offset) {
       .axes(30)
       .reset()
 
-    if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+    if (!drawIntersections(gizmo, intersection, transformA)) return
   }
 }
 

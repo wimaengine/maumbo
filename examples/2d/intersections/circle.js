@@ -68,7 +68,7 @@ function circle1(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -79,7 +79,7 @@ function circle1(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -100,7 +100,7 @@ function circle2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -111,7 +111,7 @@ function circle2(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -133,7 +133,7 @@ function circle3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -144,7 +144,7 @@ function circle3(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -165,7 +165,7 @@ function circle4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -176,7 +176,7 @@ function circle4(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -197,7 +197,7 @@ function circle5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -208,7 +208,7 @@ function circle5(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -231,7 +231,7 @@ function circleLine1(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -242,7 +242,7 @@ function circleLine1(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -264,7 +264,7 @@ function circleLine2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -275,7 +275,7 @@ function circleLine2(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -298,7 +298,7 @@ function circleLine3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -309,7 +309,7 @@ function circleLine3(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -331,7 +331,7 @@ function circleLine4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -342,7 +342,7 @@ function circleLine4(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -364,7 +364,7 @@ function circleLine5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -375,7 +375,7 @@ function circleLine5(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -398,7 +398,7 @@ function circleRectangle1(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -409,7 +409,7 @@ function circleRectangle1(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -431,7 +431,7 @@ function circleRectangle2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -442,7 +442,7 @@ function circleRectangle2(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -465,7 +465,7 @@ function circleRectangle3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -476,7 +476,7 @@ function circleRectangle3(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -498,7 +498,7 @@ function circleRectangle4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -509,7 +509,7 @@ function circleRectangle4(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -531,7 +531,7 @@ function circleRectangle5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -542,7 +542,7 @@ function circleRectangle5(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -566,7 +566,7 @@ function circleTriangle1(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -577,7 +577,7 @@ function circleTriangle1(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -599,7 +599,7 @@ function circleTriangle2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -610,7 +610,7 @@ function circleTriangle2(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -633,7 +633,7 @@ function circleTriangle3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -644,7 +644,7 @@ function circleTriangle3(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -666,7 +666,7 @@ function circleTriangle4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -677,7 +677,7 @@ function circleTriangle4(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -699,7 +699,7 @@ function circleTriangle5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -710,7 +710,7 @@ function circleTriangle5(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -734,7 +734,7 @@ function circleCapsule1(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -745,7 +745,7 @@ function circleCapsule1(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -768,7 +768,7 @@ function circleCapsule2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -779,7 +779,7 @@ function circleCapsule2(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -803,7 +803,7 @@ function circleCapsule3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -814,7 +814,7 @@ function circleCapsule3(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -837,7 +837,7 @@ function circleCapsule4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -848,7 +848,7 @@ function circleCapsule4(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -871,7 +871,7 @@ function circleCapsule5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -882,7 +882,7 @@ function circleCapsule5(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -904,7 +904,7 @@ function circlePolygon1(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -915,7 +915,7 @@ function circlePolygon1(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -936,7 +936,7 @@ function circlePolygon2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -947,7 +947,7 @@ function circlePolygon2(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -969,7 +969,7 @@ function circlePolygon3(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -980,7 +980,7 @@ function circlePolygon3(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -1001,7 +1001,7 @@ function circlePolygon4(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -1012,7 +1012,7 @@ function circlePolygon4(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }
 
 /**
@@ -1033,7 +1033,7 @@ function circlePolygon5(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
 
-  const intersections = getShape2Intersections(shapeA, shapeB, transformA, transformB)
+  const intersection = getShape2Intersections(shapeA, shapeB, transformA, transformB)
 
   gizmo
     .setTransform(transformA)
@@ -1044,5 +1044,5 @@ function circlePolygon5(gizmo, time) {
     .axes(30)
     .reset()
 
-  if (!drawIntersections(gizmo, intersections, transformA, transformB)) return
+  if (!drawIntersections(gizmo, intersection, transformA)) return
 }

@@ -1,4 +1,4 @@
-import {Affine2, Affine3, Rotary, TAU, Vector2, Vector3, BVector2 } from 'hisabati'
+import { Affine2, Affine3, Rotary, TAU, Vector2, Vector3, BVector2 } from 'hisabati'
 import { Color } from 'marangi'
 
 /**
@@ -147,12 +147,12 @@ export class Gizmo2D {
    */
   lineStrip(strips, color, closed = true) {
     for (let i = 0; i < strips.length; i++) {
-      this.buffer.stripPositions.push(Affine2.transform(this.transformation,strips[i]))
+      this.buffer.stripPositions.push(Affine2.transform(this.transformation, strips[i]))
       this.buffer.stripColors.push(color)
     }
 
-    if(strips[0] && closed){
-      this.buffer.stripPositions.push(Affine2.transform(this.transformation,strips[0]))
+    if (strips[0] && closed) {
+      this.buffer.stripPositions.push(Affine2.transform(this.transformation, strips[0]))
       this.buffer.stripColors.push(color)
     }
 
@@ -869,54 +869,40 @@ export function drawContacts(gizmo, contacts, transformA, transformB) {
   return true
 }
 
-export function drawIntersections(gizmo, intersections, transformA, transformB) {
-  if (!intersections || intersections.length === 0) {
+export function drawIntersections(gizmo, intersection, transformA) {
+  if (!intersection || intersection.points.length === 0) {
     return false
   }
 
-  for (const intersection of intersections) {
-    const worldPoints = intersection.points.map((point) => {
-      return Affine2.transform(transformA, point.clone())
-    })
+  const worldIntersection = intersection.clone()
+  worldIntersection.transform(transformA)
 
-    if (!worldPoints.length) {
-      continue
-    }
+  for (let i = 0; i < worldIntersection.points.length; i++) {
+    const pointOrSegment = worldIntersection.points[i]
+    const normal = worldIntersection.normals[i] ?? worldIntersection.normals[0]
+    const anchor = new Vector2()
 
-    if (worldPoints.length === 1) {
-      const point = worldPoints[0]
-
+    if (pointOrSegment instanceof Vector2) {
+      anchor.copy(pointOrSegment)
       gizmo
         .reset()
-        .translate(point.x, point.y)
+        .translate(pointOrSegment.x, pointOrSegment.y)
         .circle(3, Color.CYAN)
     } else {
+      Vector2.lerp(pointOrSegment.start, pointOrSegment.end, 0.5, anchor)
       gizmo
         .reset()
-        .lineStrip(worldPoints, Color.CYAN, false)
-
-      for (const point of worldPoints) {
-        gizmo
-          .reset()
-          .translate(point.x, point.y)
-          .circle(2, Color.CYAN)
-      }
+        .line(pointOrSegment.start, pointOrSegment.end, Color.CYAN, false)
     }
 
-    const anchor = worldPoints[Math.floor(worldPoints.length / 2)] ?? worldPoints[0]
-    const normal = Affine2
-      .transformWithoutTranslation(transformA, intersection.normal.clone())
-      .normalize()
-      .multiplyScalar(20)
-    const tangent = Affine2
-      .transformWithoutTranslation(transformA, intersection.tangent.clone())
-      .normalize()
-      .multiplyScalar(20)
+    if (!normal) {
+      continue
+    }
 
     gizmo
       .reset()
       .line(anchor, Vector2.add(anchor, normal), Color.RED)
-      .line(anchor, Vector2.add(anchor, tangent), Color.YELLOW)
+      .line(anchor, Vector2.add(anchor, Vector2.normal(normal)), Color.YELLOW)
   }
 
   return true
