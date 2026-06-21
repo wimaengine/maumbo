@@ -1,6 +1,6 @@
-import { Affine2, Vector2 } from 'hisabati'
+import { Affine2, TAU, Vector2 } from 'hisabati'
 import type { Feature, SupportMapped2d } from '../../core'
-import { BoundingBox2D, type Boundable2D, BoundingCircle, Segment2D } from '../../bounds'
+import { ArcBound2D, BoundingBox2D, type Boundable2D, type BoundaryPrimitive2D, BoundingCircle, Segment2D } from '../../bounds'
 import type { PointQuery2D } from '../../core/query.js'
 
 export class Capsule implements SupportMapped2d, Boundable2D, PointQuery2D {
@@ -17,6 +17,40 @@ export class Capsule implements SupportMapped2d, Boundable2D, PointQuery2D {
       new Vector2(0, this.halfHeight),
       new Vector2(0, -this.halfHeight)
     )
+  }
+
+  getBoundary(): BoundaryPrimitive2D[] {
+    if (this.halfHeight <= 1e-8) {
+      return [new ArcBound2D({
+        center: new Vector2(),
+        radius: this.radius,
+        startAngle: 0,
+        endAngle: TAU,
+      })]
+    }
+
+    return [
+      new Segment2D(
+        new Vector2(this.radius, -this.halfHeight),
+        new Vector2(this.radius, this.halfHeight),
+      ),
+      new ArcBound2D({
+        center: new Vector2(0, this.halfHeight),
+        radius: this.radius,
+        startAngle: 0,
+        endAngle: Math.PI
+      }),
+      new Segment2D(
+        new Vector2(-this.radius, this.halfHeight),
+        new Vector2(-this.radius, -this.halfHeight)
+      ),
+      new ArcBound2D({
+        center: new Vector2(0, -this.halfHeight),
+        radius: this.radius,
+        startAngle: Math.PI,
+        endAngle: TAU
+      })
+    ]
   }
 
   getVertices(axis: Vector2): [Vector2, Vector2] {
