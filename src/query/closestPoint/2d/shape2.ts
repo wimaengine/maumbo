@@ -1,6 +1,6 @@
 import { Affine2 } from 'hisabati'
 import { Circle } from '../../../shapes'
-import { Shape2 } from '../../../shapes'
+import  { type Shape2 } from '../../../shapes'
 import { getCircleClosestPoint } from './circle.js'
 import type { ClosestPoint2D } from '../../../core'
 
