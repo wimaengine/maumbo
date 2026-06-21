@@ -1,4 +1,4 @@
-import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
+import { ArcBound2D, BoundingBox2D, BoundingCircle, type BoundaryPrimitive2D, type Boundable2D } from '../../bounds/index.js'
 import { Affine2, Vector2, TAU } from 'hisabati'
 import type { Feature, SupportMapped2d } from '../../core/clipping.js'
 import type { PointQuery2D } from '../../core/query.js'
@@ -33,6 +33,15 @@ export class Circle implements Boundable2D, SupportMapped2d, PointQuery2D {
     }
 
     return vertices
+  }
+
+  getBoundary(): BoundaryPrimitive2D[] {
+    return [new ArcBound2D({
+      center: new Vector2(),
+      radius: this.radius,
+      startAngle: 0,
+      endAngle: TAU
+    })]
   }
 
   getSupportPoint2d(direction: Vector2): Vector2 {
