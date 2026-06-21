@@ -1,4 +1,4 @@
-import { Vector3 } from 'hisabati'
+import { Affine3, Quaternion, Vector3 } from 'hisabati'
 
 /**
  * A 2d segment.
@@ -26,6 +26,14 @@ export class Segment3D {
 
   translate(translation: Vector3) {
     return Segment3D.translate(this, translation, this)
+  }
+
+  rotate(center: Vector3, rotation: Quaternion) {
+    return Segment3D.rotate(this, center, rotation, this)
+  }
+
+  transform(affine: Affine3) {
+    return Segment3D.transform(this, affine, this)
   }
 
   /**
@@ -65,6 +73,29 @@ export class Segment3D {
     out.start.x = bound.start.x + translation.x
     out.start.y = bound.start.y + translation.y
     out.start.z = bound.start.z + translation.z
+
+    return out
+  }
+
+  /**
+   */
+  static rotate(bound:Segment3D, center: Vector3, rotation:Quaternion, out = new Segment3D()) {
+    const end = Vector3.subtract(bound.end, center, new Vector3())
+    const start = Vector3.subtract(bound.start, center, new Vector3())
+
+    Quaternion.transformVector3(rotation, end)
+    Quaternion.transformVector3(rotation, start)
+    Vector3.add(end, center, out.end)
+    Vector3.add(start, center, out.start)
+
+    return out
+  }
+
+  /**
+   */
+  static transform(bound:Segment3D, affine:Affine3, out = new Segment3D()) {
+    Affine3.transform(affine, bound.end, out.end)
+    Affine3.transform(affine, bound.start, out.start)
 
     return out
   }
