@@ -1,6 +1,6 @@
 import { Affine2, Vector2 } from 'hisabati'
 import { getPolygonFeature, type Feature, type SupportMapped2d } from '../../core'
-import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
+import { BoundingBox2D, BoundingCircle, Segment2D, type BoundaryPrimitive2D, type Boundable2D } from '../../bounds/index.js'
 import type { PointQuery2D } from '../../core/query.js'
 
 export class Triangle implements SupportMapped2d, Boundable2D, PointQuery2D {
@@ -23,6 +23,25 @@ export class Triangle implements SupportMapped2d, Boundable2D, PointQuery2D {
     ]
 
     return positions
+  }
+
+  getBoundary(): BoundaryPrimitive2D[] {
+    const points = this.getPoints()
+    const segments: BoundaryPrimitive2D[] = []
+
+    for (let i = 0; i < points.length; i++) {
+      const start = points[i]
+      const end = points[(i + 1) % points.length]
+      const edge = Vector2.subtract(end, start)
+
+      if (edge.magnitudeSquared() <= 1e-16) {
+        continue
+      }
+
+      segments.push(new Segment2D(start, end))
+    }
+
+    return segments
   }
 
   getSupportPoint2d(direction: Vector2): Vector2 {
