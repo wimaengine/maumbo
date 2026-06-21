@@ -1,4 +1,4 @@
-import { BoundingBox2D, BoundingCircle, type Boundable2D } from '../../bounds/index.js'
+import { BoundingBox2D, BoundingCircle, Segment2D, type BoundaryPrimitive2D, type Boundable2D } from '../../bounds/index.js'
 import { Affine2, Vector2, TAU } from 'hisabati'
 import type { Feature, SupportMapped2d } from '../../core/clipping.js'
 import type { PointQuery2D } from '../../core/query.js'
@@ -34,6 +34,29 @@ export class Ellipse implements Boundable2D, SupportMapped2d, PointQuery2D {
     }
 
     return vertices
+  }
+
+  getBoundary(): BoundaryPrimitive2D[] {
+    const points = this.getPoints()
+    const segments: BoundaryPrimitive2D[] = []
+
+    if (points.length < 2) {
+      return segments
+    }
+
+    for (let i = 0; i < points.length; i++) {
+      const start = points[i]
+      const end = points[(i + 1) % points.length]
+      const edge = Vector2.subtract(end, start)
+
+      if (edge.magnitudeSquared() <= 1e-16) {
+        continue
+      }
+
+      segments.push(new Segment2D(start, end))
+    }
+
+    return segments
   }
 
   getSupportPoint2d(direction: Vector2): Vector2 {
