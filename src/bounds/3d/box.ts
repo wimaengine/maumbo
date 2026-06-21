@@ -1,4 +1,4 @@
-import { Affine3, Vector3 } from 'hisabati'
+import { Affine3, Quaternion, Vector3 } from 'hisabati'
 
 /**
  * A 2d axis aligned bounding box.
@@ -28,8 +28,12 @@ export class BoundingBox3D {
     return BoundingBox3D.translate(this, translation, this)
   }
 
+  rotate(center: Vector3, rotation: Quaternion) {
+    return BoundingBox3D.rotate(this, center, rotation, this)
+  }
+
   transform(affine: Affine3){
-    BoundingBox3D.transform(this,affine, this)
+    return BoundingBox3D.transform(this,affine, this)
   }
 
   /**
@@ -75,9 +79,82 @@ export class BoundingBox3D {
 
   /**
    */
-  static transform(bound:BoundingBox3D, transform:Affine3, out: BoundingBox3D) {
-    Affine3.transform(transform,bound.min,out.min)
-    Affine3.transform(transform,bound.max,out.max)
+  static rotate(bound:BoundingBox3D, center: Vector3, rotation: Quaternion, out = new BoundingBox3D()) {
+    const min = Vector3.subtract(bound.min, center, new Vector3())
+    const maxXMinYMinZ = Vector3.subtract(new Vector3(bound.max.x, bound.min.y, bound.min.z), center, new Vector3())
+    const maxYMinXMinZ = Vector3.subtract(new Vector3(bound.min.x, bound.max.y, bound.min.z), center, new Vector3())
+    const maxZMinXMinY = Vector3.subtract(new Vector3(bound.min.x, bound.min.y, bound.max.z), center, new Vector3())
+    const maxXYMinZ = Vector3.subtract(new Vector3(bound.max.x, bound.max.y, bound.min.z), center, new Vector3())
+    const maxXZMinY = Vector3.subtract(new Vector3(bound.max.x, bound.min.y, bound.max.z), center, new Vector3())
+    const maxYZMinX = Vector3.subtract(new Vector3(bound.min.x, bound.max.y, bound.max.z), center, new Vector3())
+    const max = Vector3.subtract(bound.max, center, new Vector3())
+
+    Quaternion.transformVector3(rotation, min)
+    Quaternion.transformVector3(rotation, maxXMinYMinZ)
+    Quaternion.transformVector3(rotation, maxYMinXMinZ)
+    Quaternion.transformVector3(rotation, maxZMinXMinY)
+    Quaternion.transformVector3(rotation, maxXYMinZ)
+    Quaternion.transformVector3(rotation, maxXZMinY)
+    Quaternion.transformVector3(rotation, maxYZMinX)
+    Quaternion.transformVector3(rotation, max)
+    Vector3.add(min, center, min)
+    Vector3.add(maxXMinYMinZ, center, maxXMinYMinZ)
+    Vector3.add(maxYMinXMinZ, center, maxYMinXMinZ)
+    Vector3.add(maxZMinXMinY, center, maxZMinXMinY)
+    Vector3.add(maxXYMinZ, center, maxXYMinZ)
+    Vector3.add(maxXZMinY, center, maxXZMinY)
+    Vector3.add(maxYZMinX, center, maxYZMinX)
+    Vector3.add(max, center, max)
+
+    out.min.x = Math.min(min.x, maxXMinYMinZ.x, maxYMinXMinZ.x, maxZMinXMinY.x, maxXYMinZ.x, maxXZMinY.x, maxYZMinX.x, max.x)
+    out.min.y = Math.min(min.y, maxXMinYMinZ.y, maxYMinXMinZ.y, maxZMinXMinY.y, maxXYMinZ.y, maxXZMinY.y, maxYZMinX.y, max.y)
+    out.min.z = Math.min(min.z, maxXMinYMinZ.z, maxYMinXMinZ.z, maxZMinXMinY.z, maxXYMinZ.z, maxXZMinY.z, maxYZMinX.z, max.z)
+    out.max.x = Math.max(min.x, maxXMinYMinZ.x, maxYMinXMinZ.x, maxZMinXMinY.x, maxXYMinZ.x, maxXZMinY.x, maxYZMinX.x, max.x)
+    out.max.y = Math.max(min.y, maxXMinYMinZ.y, maxYMinXMinZ.y, maxZMinXMinY.y, maxXYMinZ.y, maxXZMinY.y, maxYZMinX.y, max.y)
+    out.max.z = Math.max(min.z, maxXMinYMinZ.z, maxYMinXMinZ.z, maxZMinXMinY.z, maxXYMinZ.z, maxXZMinY.z, maxYZMinX.z, max.z)
+
+    return out
+  }
+
+  /**
+   */
+  static transform(bound:BoundingBox3D, transform:Affine3, out = new BoundingBox3D()) {
+    const corners = [
+      new Vector3(bound.min.x, bound.min.y, bound.min.z),
+      new Vector3(bound.max.x, bound.min.y, bound.min.z),
+      new Vector3(bound.min.x, bound.max.y, bound.min.z),
+      new Vector3(bound.max.x, bound.max.y, bound.min.z),
+      new Vector3(bound.min.x, bound.min.y, bound.max.z),
+      new Vector3(bound.max.x, bound.min.y, bound.max.z),
+      new Vector3(bound.min.x, bound.max.y, bound.max.z),
+      new Vector3(bound.max.x, bound.max.y, bound.max.z)
+    ]
+    const first = Affine3.transform(transform, corners[0])
+
+    let minX = first.x
+    let minY = first.y
+    let minZ = first.z
+    let maxX = first.x
+    let maxY = first.y
+    let maxZ = first.z
+
+    for (let i = 1; i < corners.length; i++) {
+      const corner = Affine3.transform(transform, corners[i])
+
+      minX = Math.min(minX, corner.x)
+      minY = Math.min(minY, corner.y)
+      minZ = Math.min(minZ, corner.z)
+      maxX = Math.max(maxX, corner.x)
+      maxY = Math.max(maxY, corner.y)
+      maxZ = Math.max(maxZ, corner.z)
+    }
+
+    out.min.x = minX
+    out.min.y = minY
+    out.min.z = minZ
+    out.max.x = maxX
+    out.max.y = maxY
+    out.max.z = maxZ
 
     return out
   }
