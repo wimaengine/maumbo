@@ -7,16 +7,16 @@ export function rectangleIntersections(
   boxA: Rectangle,
   boxB: Rectangle,
   transform: Affine2,
-  _invTransform: Affine2
-): Intersection2D[] | undefined {
-  return intersectShapes2d(boxA, boxB, transform)
+  tolerance = 1e-8
+): Intersection2D | undefined {
+  return intersectShapes2d(boxA, boxB, transform, tolerance)
 }
 
 export function circleRectangleIntersections(
   circle: Circle,
   rectangle: Rectangle,
   transform: Affine2,
-  _invTransform: Affine2
-): Intersection2D[] | undefined {
-  return intersectShapes2d(circle, rectangle, transform)
+  tolerance = 1e-8
+): Intersection2D | undefined {
+  return intersectShapes2d(circle, rectangle, transform, tolerance)
 }

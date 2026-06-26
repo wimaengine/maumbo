@@ -15,7 +15,7 @@ test("circlePolygonIntersection: returns undefined when the shapes are disjoint"
   transform.x = -3
   transform.y = -3
 
-  strictEqual(circlePolygonIntersection(new Circle(1), polygon, transform, Affine2.copy(transform).invert()), undefined)
+  strictEqual(circlePolygonIntersection(new Circle(1), polygon, transform), undefined)
 })
 
 test("circlePolygonIntersection: returns undefined when the circle is fully contained", () => {
@@ -28,7 +28,7 @@ test("circlePolygonIntersection: returns undefined when the circle is fully cont
   ])
   const transform = Affine2.identity()
 
-  strictEqual(circlePolygonIntersection(new Circle(0.5), polygon, transform, Affine2.copy(transform).invert()), undefined)
+  strictEqual(circlePolygonIntersection(new Circle(0.5), polygon, transform), undefined)
 })
 
 test("circlePolygonIntersection: returns one point on a tangency", () => {
@@ -43,13 +43,13 @@ test("circlePolygonIntersection: returns one point on a tangency", () => {
   transform.x = -2.5
   transform.y = -0.5
 
-  const intersections = circlePolygonIntersection(new Circle(1), polygon, transform, Affine2.copy(transform).invert())
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].points[0].x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].points[0].y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, 0, 1e-10), true)
+  const intersections = circlePolygonIntersection(new Circle(1), polygon, transform)
+  strictEqual(intersections.points.length, 1)
+  strictEqual(intersections.normals.length, 1)
+  strictEqual(fuzzyEqual(intersections.points[0].x, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.points[0].y, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].x, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].y, 0, 1e-10), true)
 })
 
 test("circlePolygonIntersection: returns two points when the circle crosses the polygon", () => {
@@ -65,17 +65,16 @@ test("circlePolygonIntersection: returns two points when the circle crosses the 
   transform.x = -2
   transform.y = -1.5
 
-  const intersections = circlePolygonIntersection(new Circle(1), polygon, transform, Affine2.copy(transform).invert())
-  strictEqual(intersections.length, 2)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, -0.7954, 1e-4), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, -0.606, 1e-4), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.x, -0.8949, 1e-4), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.y, -0.4464, 1e-4), true)
+  const intersections = circlePolygonIntersection(new Circle(1), polygon, transform)
+  strictEqual(intersections.points.length, 2)
+  strictEqual(intersections.normals.length, 2)
+  strictEqual(fuzzyEqual(intersections.normals[0].x, -0.7954, 1e-4), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].y, -0.606, 1e-4), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].x, -0.8949, 1e-4), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].y, -0.4464, 1e-4), true)
 })
 
-test("circlePolygonIntersection: returns more than two points when the circle crosses multiple polygon edges", () => {
+test("circlePolygonIntersection: returns three points when the circle crosses multiple polygon edges", () => {
   const polygon = ConvexPolygon.fromPoints([
     new Vector2(-1, -1),
     new Vector2(1, -1),
@@ -87,13 +86,13 @@ test("circlePolygonIntersection: returns more than two points when the circle cr
   transform.x = -0.5
   transform.y = -0.5
 
-  const intersections = circlePolygonIntersection(new Circle(1), polygon, transform, Affine2.copy(transform).invert())
-  strictEqual(intersections.length, 3)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(intersections[2].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, 0.8, 1e-4), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, -0.6, 1e-4), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.x, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.y, 0, 1e-10), true)
+  const intersections = circlePolygonIntersection(new Circle(1), polygon, transform)
+  strictEqual(intersections.points.length, 3)
+  strictEqual(intersections.normals.length, 3)
+  strictEqual(fuzzyEqual(intersections.normals[0].x, 0.8, 1e-4), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].y, -0.6, 1e-4), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].x, 1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].y, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[2].x, -0.3846153846153846, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[2].y, 0.9230769230769231, 1e-10), true)
 })

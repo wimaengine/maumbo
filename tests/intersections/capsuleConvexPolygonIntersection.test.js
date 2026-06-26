@@ -16,7 +16,7 @@ test("capsuleConvexPolygonIntersection: returns undefined when the shapes are di
   transform.y = -3
 
   strictEqual(
-    capsuleConvexPolygonIntersection(new Capsule(1, 2), polygon, transform, Affine2.copy(transform).invert()),
+    capsuleConvexPolygonIntersection(new Capsule(1, 2), polygon, transform),
     undefined
   )
 })
@@ -32,7 +32,7 @@ test("capsuleConvexPolygonIntersection: returns undefined when one shape contain
   const transform = Affine2.identity()
 
   strictEqual(
-    capsuleConvexPolygonIntersection(new Capsule(3, 4), polygon, transform, Affine2.copy(transform).invert()),
+    capsuleConvexPolygonIntersection(new Capsule(3, 4), polygon, transform),
     undefined
   )
 })
@@ -52,17 +52,14 @@ test("capsuleConvexPolygonIntersection: returns one point on a tangency", () => 
   const intersections = capsuleConvexPolygonIntersection(
     new Capsule(1, 2),
     polygon,
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].points[0].x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].points[0].y, -2, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].tangent.x, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].tangent.y, -1, 1e-10), true)
+  strictEqual(intersections.points.length, 1)
+  strictEqual(intersections.normals.length, 1)
+  strictEqual(fuzzyEqual(intersections.points[0].x, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.points[0].y, -2, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].x, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].y, 0, 1e-10), true)
 })
 
 test("capsuleConvexPolygonIntersection: returns two points when the polygon crosses the capsule", () => {
@@ -80,18 +77,18 @@ test("capsuleConvexPolygonIntersection: returns two points when the polygon cros
   const intersections = capsuleConvexPolygonIntersection(
     new Capsule(1, 2),
     polygon,
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 2)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].points[0].x, -0.6, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].points[0].y, -2.8, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, -0.6, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, -0.8, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].tangent.x, 0.8, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].tangent.y, -0.6, 1e-10), true)
+  strictEqual(intersections.points.length, 2)
+  strictEqual(intersections.normals.length, 2)
+  strictEqual(fuzzyEqual(intersections.points[0].x, -0.6, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.points[0].y, -2.8, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.points[1].x, -0.9841714333892267, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.points[1].y, -2.177219044407182, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].x, -0.6, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].y, -0.8, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].x, -0.9841714333892269, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].y, -0.17721904440718197, 1e-10), true)
 })
 
 test("capsuleConvexPolygonIntersection: returns more than two points when the shapes overlap across multiple edges", () => {
@@ -109,15 +106,12 @@ test("capsuleConvexPolygonIntersection: returns more than two points when the sh
   const intersections = capsuleConvexPolygonIntersection(
     new Capsule(1, 2),
     polygon,
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 3)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(intersections[2].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.y, 0, 1e-10), true)
+  strictEqual(intersections.points.length, 3)
+  strictEqual(intersections.normals.length, 3)
+  strictEqual(fuzzyEqual(intersections.normals[0].x, 1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].y, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].x, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].y, 0, 1e-10), true)
 })

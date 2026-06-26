@@ -1,37 +1,9 @@
-import { Affine2, TAU, Vector2 } from 'hisabati'
+import { Affine2, clamp, TAU, Vector2, wrap } from 'hisabati'
 import { Intersection2D } from '../../../core'
-import {
-  Capsule,
-  Circle,
-  ConvexPolygon,
-  Line2,
-  Rectangle,
-  type Shape2,
-  Triangle
-} from '../../../shapes'
+import type { Shape2 } from '../../../shapes'
+import { ArcBound2D, Segment2D, type BoundaryPrimitive2D } from '../../../bounds'
 
-const EPSILON = 1e-8
 const SAMPLE_POINTS_PER_PI = 16
-
-type ShapeLike2D = Shape2 | Capsule
-
-type SegmentPrimitive = {
-  type: 'segment'
-  start: Vector2
-  end: Vector2
-  normal: Vector2
-}
-
-type ArcPrimitive = {
-  type: 'arc'
-  center: Vector2
-  radius: number
-  startAngle: number
-  endAngle: number
-  full: boolean
-}
-
-type BoundaryPrimitive = SegmentPrimitive | ArcPrimitive
 
 type AngleInterval = {
   start: number
@@ -39,226 +11,124 @@ type AngleInterval = {
 }
 
 export function intersectShapes2d(
-  shapeA: ShapeLike2D,
-  shapeB: ShapeLike2D,
-  transform: Affine2
-): Intersection2D[] | undefined {
+  shapeA: Shape2,
+  shapeB: Shape2,
+  transform: Affine2,
+  tolerance = 1e-8
+): Intersection2D | undefined {
   const primitivesA = getBoundaryPrimitives(shapeA)
   const primitivesB = getBoundaryPrimitives(shapeB, transform)
+  const scale = Math.max(
+    1,
+    getBoundaryScale(primitivesA),
+    getBoundaryScale(primitivesB)
+  )
+  const effectiveTolerance = tolerance * scale
   const intersections: Intersection2D[] = []
 
   for (const primitiveA of primitivesA) {
     for (const primitiveB of primitivesB) {
-      intersections.push(...intersectPrimitivePair(primitiveA, primitiveB))
+      intersectPrimitivePair(intersections, primitiveA, primitiveB, effectiveTolerance)
     }
   }
 
-  return dedupeIntersections(intersections)
+  const deduped = dedupeIntersections(intersections, effectiveTolerance)
+
+  if (!deduped.length) {
+    return undefined
+  }
+
+  return flattenIntersections(deduped)
 }
 
 function getBoundaryPrimitives(
-  shape: ShapeLike2D,
+  shape: Shape2,
   transform?: Affine2
-): BoundaryPrimitive[] {
-  let primitives: BoundaryPrimitive[]
-
-  if (shape instanceof Circle) {
-    primitives = [{
-      type: 'arc',
-      center: new Vector2(),
-      radius: shape.radius,
-      startAngle: 0,
-      endAngle: TAU,
-      full: true
-    }]
-  } else if (shape instanceof Line2) {
-    primitives = [createSegment(
-      new Vector2(-shape.halfLength, 0),
-      new Vector2(shape.halfLength, 0)
-    )]
-  } else if (shape instanceof Rectangle || shape instanceof Triangle || shape instanceof ConvexPolygon) {
-    primitives = createPolygonSegments(shape.getPoints())
-  } else if (shape instanceof Capsule) {
-    primitives = createCapsulePrimitives(shape)
-  } else {
-    primitives = []
-  }
+): BoundaryPrimitive2D[] {
+  const primitives = shape.getBoundary()
 
   return transform ? primitives.map((primitive) => transformPrimitive(primitive, transform)) : primitives
 }
 
-function createPolygonSegments(points: Vector2[]): SegmentPrimitive[] {
-  if (points.length < 2) {
-    return []
+function transformPrimitive(
+  primitive: BoundaryPrimitive2D,
+  transform: Affine2
+): BoundaryPrimitive2D {
+  if (primitive instanceof Segment2D) {
+    return Segment2D.transform(primitive, transform, new Segment2D())
   }
 
-  const centroid = points.reduce((acc, point) => acc.add(point), new Vector2()).multiplyScalar(1 / points.length)
-  const segments: SegmentPrimitive[] = []
+  return ArcBound2D.transform(primitive, transform, new ArcBound2D())
+}
 
-  for (let i = 0; i < points.length; i++) {
-    const start = points[i].clone()
-    const end = points[(i + 1) % points.length].clone()
-    const edge = Vector2.subtract(end, start)
+function getBoundaryScale(primitives: BoundaryPrimitive2D[]): number {
+  let scale = 1
 
-    if (edge.magnitudeSquared() <= EPSILON * EPSILON) {
+  for (const primitive of primitives) {
+    if (primitive instanceof Segment2D) {
+      scale = Math.max(
+        scale,
+        Vector2.magnitude(primitive.start),
+        Vector2.magnitude(primitive.end)
+      )
       continue
     }
 
-    let normal = new Vector2(edge.y, -edge.x).normalize()
-    const midpoint = Vector2.add(start, end).multiplyScalar(0.5)
-
-    if (Vector2.dot(normal, Vector2.subtract(centroid, midpoint)) > 0) {
-      normal.reverse()
-    }
-
-    segments.push({
-      type: 'segment',
-      start,
-      end,
-      normal
-    })
+    scale = Math.max(
+      scale,
+      Vector2.magnitude(primitive.center) + primitive.radius
+    )
   }
 
-  return segments
-}
-
-function createCapsulePrimitives(shape: Capsule): BoundaryPrimitive[] {
-  if (shape.halfHeight <= EPSILON) {
-    return [{
-      type: 'arc',
-      center: new Vector2(),
-      radius: shape.radius,
-      startAngle: 0,
-      endAngle: TAU,
-      full: true
-    }]
-  }
-
-  return [
-    {
-      type: 'segment',
-      start: new Vector2(shape.radius, -shape.halfHeight),
-      end: new Vector2(shape.radius, shape.halfHeight),
-      normal: new Vector2(1, 0)
-    },
-    {
-      type: 'arc',
-      center: new Vector2(0, shape.halfHeight),
-      radius: shape.radius,
-      startAngle: 0,
-      endAngle: Math.PI,
-      full: false
-    },
-    {
-      type: 'segment',
-      start: new Vector2(-shape.radius, shape.halfHeight),
-      end: new Vector2(-shape.radius, -shape.halfHeight),
-      normal: new Vector2(-1, 0)
-    },
-    {
-      type: 'arc',
-      center: new Vector2(0, -shape.halfHeight),
-      radius: shape.radius,
-      startAngle: Math.PI,
-      endAngle: TAU,
-      full: false
-    }
-  ]
-}
-
-function createSegment(start: Vector2, end: Vector2): SegmentPrimitive {
-  const tangent = Vector2.subtract(end, start).normalize()
-
-  return {
-    type: 'segment',
-    start,
-    end,
-    normal: new Vector2(tangent.y, -tangent.x)
-  }
-}
-
-function transformPrimitive(primitive: BoundaryPrimitive, transform: Affine2): BoundaryPrimitive {
-  if (primitive.type === 'segment') {
-    return {
-      type: 'segment',
-      start: transform.transform(primitive.start.clone()),
-      end: transform.transform(primitive.end.clone()),
-      normal: Affine2.transformWithoutTranslation(transform, primitive.normal.clone()).normalize()
-    }
-  }
-
-  const center = transform.transform(primitive.center.clone())
-
-  if (primitive.full) {
-    return {
-      type: 'arc',
-      center,
-      radius: primitive.radius,
-      startAngle: 0,
-      endAngle: TAU,
-      full: true
-    }
-  }
-
-  const startPoint = transformPointOnArc(primitive, primitive.startAngle, transform)
-  const endPoint = transformPointOnArc(primitive, primitive.endAngle, transform)
-
-  return {
-    type: 'arc',
-    center,
-    radius: primitive.radius,
-    startAngle: Math.atan2(startPoint.y - center.y, startPoint.x - center.x),
-    endAngle: Math.atan2(endPoint.y - center.y, endPoint.x - center.x),
-    full: false
-  }
-}
-
-function transformPointOnArc(arc: ArcPrimitive, angle: number, transform: Affine2): Vector2 {
-  const point = pointOnCircle(arc.center, arc.radius, angle)
-  return transform.transform(point)
+  return scale
 }
 
 function intersectPrimitivePair(
-  primitiveA: BoundaryPrimitive,
-  primitiveB: BoundaryPrimitive
-): Intersection2D[] {
-  if (primitiveA.type === 'segment' && primitiveB.type === 'segment') {
-    return intersectSegmentSegment(primitiveA, primitiveB)
+  intersections: Intersection2D[],
+  primitiveA: BoundaryPrimitive2D,
+  primitiveB: BoundaryPrimitive2D,
+  tolerance: number
+): void {
+  if (primitiveA instanceof Segment2D && primitiveB instanceof Segment2D) {
+    intersectSegmentSegment(intersections, primitiveA, primitiveB, tolerance)
+    return
   }
 
-  if (primitiveA.type === 'segment' && primitiveB.type === 'arc') {
-    return intersectSegmentArc(primitiveA, primitiveB)
+  if (primitiveA instanceof Segment2D && primitiveB instanceof ArcBound2D) {
+    intersectSegmentArc(intersections, primitiveA, primitiveB, tolerance)
+    return
   }
 
-  if (primitiveA.type === 'arc' && primitiveB.type === 'segment') {
-    return intersectArcSegment(primitiveA, primitiveB)
+  if (primitiveA instanceof ArcBound2D && primitiveB instanceof Segment2D) {
+    intersectArcSegment(intersections, primitiveA, primitiveB, tolerance)
+    return
   }
 
-  if (primitiveA.type === 'arc' && primitiveB.type === 'arc') {
-    return intersectArcArc(primitiveA, primitiveB)
+  if (primitiveA instanceof ArcBound2D && primitiveB instanceof ArcBound2D) {
+    intersectArcArc(intersections, primitiveA, primitiveB, tolerance)
   }
-
-  return []
 }
 
 function intersectSegmentSegment(
-  segmentA: SegmentPrimitive,
-  segmentB: SegmentPrimitive
-): Intersection2D[] {
+  intersections: Intersection2D[],
+  segmentA: Segment2D,
+  segmentB: Segment2D,
+  tolerance: number
+): void {
   const p = segmentA.start
   const q = segmentB.start
   const r = Vector2.subtract(segmentA.end, segmentA.start)
   const s = Vector2.subtract(segmentB.end, segmentB.start)
-  const rxs = cross2d(r, s)
+  const rxs = Vector2.cross(r, s)
   const qmp = Vector2.subtract(q, p)
-  const qmpxr = cross2d(qmp, r)
-  const intersections: Intersection2D[] = []
+  const qmpxr = Vector2.cross(qmp, r)
+  const normal = segmentNormal(segmentA)
 
-  if (Math.abs(rxs) <= EPSILON && Math.abs(qmpxr) <= EPSILON) {
+  if (Math.abs(rxs) <= tolerance && Math.abs(qmpxr) <= tolerance) {
     const rr = Vector2.dot(r, r)
 
-    if (rr <= EPSILON) {
-      return intersections
+    if (rr <= tolerance) {
+      return
     }
 
     let t0 = Vector2.dot(qmp, r) / rr
@@ -273,190 +143,179 @@ function intersectSegmentSegment(
     const overlapStart = Math.max(0, t0)
     const overlapEnd = Math.min(1, t1)
 
-    if (overlapEnd < -EPSILON || overlapStart > 1 + EPSILON || overlapEnd < overlapStart - EPSILON) {
-      return intersections
+    if (
+      overlapEnd < -tolerance ||
+      overlapStart > 1 + tolerance ||
+      overlapEnd < overlapStart - tolerance
+    ) {
+      return
     }
 
-    const start = Vector2.add(p, Vector2.multiplyScalar(r, clamp01(overlapStart)))
-    const end = Vector2.add(p, Vector2.multiplyScalar(r, clamp01(overlapEnd)))
+    const start = Vector2.add(p, Vector2.multiplyScalar(r, clamp(overlapStart, 0, 1)))
+    const end = Vector2.add(p, Vector2.multiplyScalar(r, clamp(overlapEnd, 0, 1)))
 
-    if (Vector2.distanceToSquared(start, end) <= EPSILON * EPSILON) {
-      intersections.push(createPointIntersection(start, segmentA.normal, segmentDirection(segmentA)))
+    if (Vector2.distanceToSquared(start, end) <= tolerance * tolerance) {
+      intersections.push(new Intersection2D([start.clone()], [normal.clone()]))
     } else {
-      intersections.push(createLinearIntersection([start, end], segmentA.normal, segmentDirection(segmentA)))
+      intersections.push(new Intersection2D(
+        [new Segment2D(start.clone(), end.clone())],
+        [normal.clone()]
+      ))
     }
 
-    return intersections
+    return
   }
 
-  if (Math.abs(rxs) <= EPSILON) {
-    return intersections
+  if (Math.abs(rxs) <= tolerance) {
+    return
   }
 
-  const t = cross2d(qmp, s) / rxs
-  const u = cross2d(qmp, r) / rxs
+  const t = Vector2.cross(qmp, s) / rxs
+  const u = Vector2.cross(qmp, r) / rxs
 
-  if (!isWithinUnitInterval(t) || !isWithinUnitInterval(u)) {
-    return intersections
+  if (!isWithinUnitInterval(t, tolerance) || !isWithinUnitInterval(u, tolerance)) {
+    return
   }
 
   const point = Vector2.add(p, Vector2.multiplyScalar(r, t))
-  intersections.push(createPointIntersection(point, segmentA.normal, segmentDirection(segmentA)))
-
-  return intersections
+  intersections.push(new Intersection2D([point.clone()], [normal.clone()]))
 }
 
 function intersectSegmentArc(
-  segment: SegmentPrimitive,
-  arc: ArcPrimitive
-): Intersection2D[] {
+  intersections: Intersection2D[],
+  segment: Segment2D,
+  arc: ArcBound2D,
+  tolerance: number
+): void {
   const direction = Vector2.subtract(segment.end, segment.start)
   const offset = Vector2.subtract(segment.start, arc.center)
   const a = Vector2.dot(direction, direction)
   const b = 2 * Vector2.dot(offset, direction)
   const c = Vector2.dot(offset, offset) - arc.radius * arc.radius
   const discriminant = b * b - 4 * a * c
-  const intersections: Intersection2D[] = []
+  const normal = segmentNormal(segment)
 
-  if (discriminant < -EPSILON || a <= EPSILON) {
-    return intersections
+  if (a <= tolerance) {
+    return
   }
 
-  if (Math.abs(discriminant) <= EPSILON) {
-    const t = -b / (2 * a)
-
-    if (!isWithinUnitInterval(t)) {
-      return intersections
-    }
-
-    const point = Vector2.add(segment.start, Vector2.multiplyScalar(direction, t))
-
-    if (isPointOnArc(point, arc)) {
-      intersections.push(createPointIntersection(point, segment.normal, segmentDirection(segment)))
-    }
-
-    return intersections
-  }
-
-  const sqrtDisc = Math.sqrt(discriminant)
-  const ts = [
-    (-b - sqrtDisc) / (2 * a),
-    (-b + sqrtDisc) / (2 * a)
-  ]
+  const sqrtDisc = Math.sqrt(Math.max(0, discriminant))
+  const ts = discriminant > 0
+    ? [
+        (-b - sqrtDisc) / (2 * a),
+        (-b + sqrtDisc) / (2 * a)
+      ]
+    : [
+        -b / (2 * a)
+      ]
 
   for (const t of ts) {
-    if (!isWithinUnitInterval(t)) {
+    if (!isWithinUnitInterval(t, tolerance)) {
       continue
     }
 
     const point = Vector2.add(segment.start, Vector2.multiplyScalar(direction, t))
 
-    if (isPointOnArc(point, arc)) {
-      intersections.push(createPointIntersection(point, segment.normal, segmentDirection(segment)))
+    if (isPointOnArc(point, arc, tolerance)) {
+      intersections.push(new Intersection2D([point.clone()], [normal.clone()]))
     }
   }
-
-  return dedupeIntersections(intersections) ?? []
 }
 
 function intersectArcSegment(
-  arc: ArcPrimitive,
-  segment: SegmentPrimitive
-): Intersection2D[] {
+  intersections: Intersection2D[],
+  arc: ArcBound2D,
+  segment: Segment2D,
+  tolerance: number
+): void {
   const direction = Vector2.subtract(segment.end, segment.start)
   const offset = Vector2.subtract(segment.start, arc.center)
   const a = Vector2.dot(direction, direction)
   const b = 2 * Vector2.dot(offset, direction)
   const c = Vector2.dot(offset, offset) - arc.radius * arc.radius
   const discriminant = b * b - 4 * a * c
-  const intersections: Intersection2D[] = []
 
-  if (discriminant < -EPSILON || a <= EPSILON) {
-    return intersections
+  if (a <= tolerance) {
+    return
   }
 
-  if (Math.abs(discriminant) <= EPSILON) {
-    const t = -b / (2 * a)
-
-    if (!isWithinUnitInterval(t)) {
-      return intersections
-    }
-
-    const point = Vector2.add(segment.start, Vector2.multiplyScalar(direction, t))
-
-    if (isPointOnArc(point, arc)) {
-      intersections.push(createPointIntersection(point, arcNormal(arc, point), arcTangent(arc, point)))
-    }
-
-    return intersections
-  }
-
-  const sqrtDisc = Math.sqrt(discriminant)
-  const ts = [
-    (-b - sqrtDisc) / (2 * a),
-    (-b + sqrtDisc) / (2 * a)
-  ]
+  const sqrtDisc = Math.sqrt(Math.max(0, discriminant))
+  const ts = discriminant > 0
+    ? [
+        (-b - sqrtDisc) / (2 * a),
+        (-b + sqrtDisc) / (2 * a)
+      ]
+    : [
+        -b / (2 * a)
+      ]
 
   for (const t of ts) {
-    if (!isWithinUnitInterval(t)) {
+    if (!isWithinUnitInterval(t, tolerance)) {
       continue
     }
 
     const point = Vector2.add(segment.start, Vector2.multiplyScalar(direction, t))
 
-    if (isPointOnArc(point, arc)) {
-      intersections.push(createPointIntersection(point, arcNormal(arc, point), arcTangent(arc, point)))
+    if (isPointOnArc(point, arc, tolerance)) {
+      intersections.push(
+        new Intersection2D([point.clone()], [arcNormal(arc, point).clone()])
+      )
     }
   }
-
-  return dedupeIntersections(intersections) ?? []
 }
 
 function intersectArcArc(
-  arcA: ArcPrimitive,
-  arcB: ArcPrimitive
-): Intersection2D[] {
+  intersections: Intersection2D[],
+  arcA: ArcBound2D,
+  arcB: ArcBound2D,
+  tolerance: number
+): void {
   const centerDelta = Vector2.subtract(arcB.center, arcA.center)
   const distance = centerDelta.magnitude()
-  const intersections: Intersection2D[] = []
 
-  if (distance <= EPSILON && Math.abs(arcA.radius - arcB.radius) <= EPSILON) {
-    const overlaps = intersectArcIntervals(arcA, arcB)
+  if (distance <= tolerance && Math.abs(arcA.radius - arcB.radius) <= tolerance) {
+    const overlaps = intersectArcIntervals(arcA, arcB, tolerance)
 
     for (const overlap of overlaps) {
       const span = overlapSpan(overlap)
 
-      if (span <= EPSILON) {
+      if (span <= tolerance) {
         const point = pointOnCircle(arcA.center, arcA.radius, overlap.start)
-        intersections.push(createPointIntersection(point, arcNormal(arcA, point), arcTangent(arcA, point)))
+        intersections.push(
+          new Intersection2D([point.clone()], [arcNormal(arcA, point).clone()])
+        )
         continue
       }
 
-      const points = sampleArcPoints(arcA.center, arcA.radius, overlap.start, overlap.end)
-      const midpoint = points[Math.floor(points.length / 2)] ?? pointOnCircle(arcA.center, arcA.radius, overlap.start)
+      const points = sampleArcPoints(
+        arcA.center,
+        arcA.radius,
+        overlap.start,
+        overlap.end,
+        tolerance
+      )
 
       intersections.push(
-        createLinearIntersection(
-          points,
-          arcNormal(arcA, midpoint),
-          arcTangent(arcA, midpoint)
+        new Intersection2D(
+          points.map((point) => point.clone()),
+          points.map((point) => arcNormal(arcA, point))
         )
       )
     }
 
-    return intersections
+    return
   }
 
-  if (distance > arcA.radius + arcB.radius + EPSILON) {
-    return intersections
+  if (distance > arcA.radius + arcB.radius + tolerance) {
+    return
   }
 
-  if (distance < Math.abs(arcA.radius - arcB.radius) - EPSILON) {
-    return intersections
+  if (distance < Math.abs(arcA.radius - arcB.radius) - tolerance) {
+    return
   }
 
-  if (distance <= EPSILON) {
-    return intersections
+  if (distance <= tolerance) {
+    return
   }
 
   const a = (
@@ -466,23 +325,19 @@ function intersectArcArc(
   ) / (2 * distance)
   const hSquared = arcA.radius * arcA.radius - a * a
 
-  if (hSquared < -EPSILON) {
-    return intersections
-  }
-
   const midpoint = Vector2.add(
     arcA.center,
     Vector2.multiplyScalar(centerDelta, a / distance)
   )
 
-  if (Math.abs(hSquared) <= EPSILON) {
-    if (isPointOnArc(midpoint, arcA) && isPointOnArc(midpoint, arcB)) {
+  if (hSquared <= 0) {
+    if (isPointOnArc(midpoint, arcA, tolerance) && isPointOnArc(midpoint, arcB, tolerance)) {
       intersections.push(
-        createPointIntersection(midpoint, arcNormal(arcA, midpoint), arcTangent(arcA, midpoint))
+        new Intersection2D([midpoint.clone()], [arcNormal(arcA, midpoint).clone()])
       )
     }
 
-    return intersections
+    return
   }
 
   const h = Math.sqrt(hSquared)
@@ -493,19 +348,21 @@ function intersectArcArc(
   ]
 
   for (const point of candidates) {
-    if (isPointOnArc(point, arcA) && isPointOnArc(point, arcB)) {
+    if (isPointOnArc(point, arcA, tolerance) && isPointOnArc(point, arcB, tolerance)) {
       intersections.push(
-        createPointIntersection(point, arcNormal(arcA, point), arcTangent(arcA, point))
+        new Intersection2D([point.clone()], [arcNormal(arcA, point).clone()])
       )
     }
   }
-
-  return dedupeIntersections(intersections) ?? []
 }
 
-function intersectArcIntervals(arcA: ArcPrimitive, arcB: ArcPrimitive): AngleInterval[] {
-  const intervalsA = getArcIntervals(arcA)
-  const intervalsB = getArcIntervals(arcB)
+function intersectArcIntervals(
+  arcA: ArcBound2D,
+  arcB: ArcBound2D,
+  tolerance: number
+): AngleInterval[] {
+  const intervalsA = getArcIntervals(arcA, tolerance)
+  const intervalsB = getArcIntervals(arcB, tolerance)
   const overlaps: AngleInterval[] = []
 
   for (const intervalA of intervalsA) {
@@ -513,7 +370,7 @@ function intersectArcIntervals(arcA: ArcPrimitive, arcB: ArcPrimitive): AngleInt
       const start = Math.max(intervalA.start, intervalB.start)
       const end = Math.min(intervalA.end, intervalB.end)
 
-      if (end < start - EPSILON) {
+      if (end < start - tolerance) {
         continue
       }
 
@@ -524,18 +381,14 @@ function intersectArcIntervals(arcA: ArcPrimitive, arcB: ArcPrimitive): AngleInt
     }
   }
 
-  return mergeIntervals(overlaps)
+  return mergeIntervals(overlaps, tolerance)
 }
 
-function getArcIntervals(arc: ArcPrimitive): AngleInterval[] {
-  if (arc.full) {
-    return [{ start: 0, end: TAU }]
-  }
+function getArcIntervals(arc: ArcBound2D, tolerance: number): AngleInterval[] {
+  const start = wrap(arc.startAngle, 0, TAU)
+  const end = wrap(arc.endAngle, 0, TAU)
 
-  const start = normalizeAngle(arc.startAngle)
-  const end = normalizeAngle(arc.endAngle)
-
-  if (Math.abs(overlapSpan({ start, end: start + deltaAngle(start, end) }) - TAU) <= EPSILON) {
+  if (isFullCircleArc(arc, tolerance)) {
     return [{ start: 0, end: TAU }]
   }
 
@@ -549,7 +402,7 @@ function getArcIntervals(arc: ArcPrimitive): AngleInterval[] {
   ]
 }
 
-function mergeIntervals(intervals: AngleInterval[]): AngleInterval[] {
+function mergeIntervals(intervals: AngleInterval[], tolerance: number): AngleInterval[] {
   if (!intervals.length) {
     return []
   }
@@ -561,7 +414,7 @@ function mergeIntervals(intervals: AngleInterval[]): AngleInterval[] {
     const current = sorted[i]
     const last = merged[merged.length - 1]
 
-    if (current.start <= last.end + EPSILON) {
+    if (current.start <= last.end + tolerance) {
       last.end = Math.max(last.end, current.end)
     } else {
       merged.push({ ...current })
@@ -575,11 +428,12 @@ function sampleArcPoints(
   center: Vector2,
   radius: number,
   startAngle: number,
-  endAngle: number
+  endAngle: number,
+  tolerance: number
 ): Vector2[] {
   const span = overlapSpan({ start: startAngle, end: endAngle })
 
-  if (span <= EPSILON) {
+  if (span <= tolerance) {
     return [pointOnCircle(center, radius, startAngle)]
   }
 
@@ -591,50 +445,38 @@ function sampleArcPoints(
     points.push(pointOnCircle(center, radius, angle))
   }
 
-  if (Math.abs(span - TAU) <= EPSILON) {
+  if (Math.abs(span - TAU) <= tolerance) {
     points.push(points[0].clone())
   }
 
   return points
 }
 
-function isPointOnArc(point: Vector2, arc: ArcPrimitive): boolean {
-  const distanceSquared = Vector2.distanceToSquared(point, arc.center)
+function isPointOnArc(point: Vector2, arc: ArcBound2D, tolerance: number): boolean {
+  const distance = Vector2.distanceTo(point, arc.center)
 
-  if (Math.abs(distanceSquared - arc.radius * arc.radius) > 1e-5) {
+  if (Math.abs(distance - arc.radius) > tolerance) {
     return false
   }
 
-  if (arc.full) {
+  if (isFullCircleArc(arc, tolerance)) {
     return true
   }
 
   const angle = Math.atan2(point.y - arc.center.y, point.x - arc.center.x)
-  return isAngleOnArc(angle, arc.startAngle, arc.endAngle)
+  return isAngleOnArc(angle, arc.startAngle, arc.endAngle, tolerance)
 }
 
-function isAngleOnArc(angle: number, startAngle: number, endAngle: number): boolean {
-  const start = normalizeAngle(startAngle)
-  const angleDelta = deltaAngle(start, angle)
-  const arcDelta = deltaAngle(start, endAngle)
-
-  return angleDelta <= arcDelta + 1e-6
-}
-
-function createPointIntersection(
-  point: Vector2,
-  normal: Vector2,
-  tangent: Vector2
-): Intersection2D {
-  return new Intersection2D([point.clone()], normal.clone(), tangent.clone())
-}
-
-function createLinearIntersection(
-  points: Vector2[],
-  normal: Vector2,
-  tangent: Vector2
-): Intersection2D {
-  return new Intersection2D(points.map((point) => point.clone()), normal.clone(), tangent.clone())
+function isAngleOnArc(
+  angle: number,
+  startAngle: number,
+  endAngle: number,
+  tolerance: number
+): boolean {
+  return (
+    wrap(angle - startAngle, 0, TAU) <=
+    wrap(endAngle - startAngle, 0, TAU) + tolerance
+  )
 }
 
 function pointOnCircle(center: Vector2, radius: number, angle: number): Vector2 {
@@ -644,23 +486,34 @@ function pointOnCircle(center: Vector2, radius: number, angle: number): Vector2 
   )
 }
 
-function arcNormal(arc: ArcPrimitive, point: Vector2): Vector2 {
+function arcNormal(arc: ArcBound2D, point: Vector2): Vector2 {
   return Vector2.subtract(point, arc.center).normalize()
 }
 
-function arcTangent(arc: ArcPrimitive, point: Vector2): Vector2 {
-  const normal = arcNormal(arc, point)
-  return new Vector2(-normal.y, normal.x)
+function segmentNormal(segment: Segment2D): Vector2 {
+  return new Vector2(
+    segment.end.y - segment.start.y,
+    segment.start.x - segment.end.x
+  ).normalize()
 }
 
-function segmentDirection(segment: SegmentPrimitive): Vector2 {
-  const direction = Vector2.subtract(segment.end, segment.start)
-  return direction.magnitudeSquared() <= EPSILON * EPSILON
-    ? new Vector2(-segment.normal.y, segment.normal.x)
-    : direction.normalize()
+function isFullCircleArc(arc: ArcBound2D, tolerance: number): boolean {
+  const span = Math.abs(arc.endAngle - arc.startAngle)
+  return Math.abs(span - TAU) <= tolerance
 }
 
-function dedupeIntersections(intersections: Intersection2D[]): Intersection2D[] | undefined {
+function overlapSpan(interval: AngleInterval): number {
+  return Math.max(0, interval.end - interval.start)
+}
+
+function isWithinUnitInterval(value: number, tolerance: number): boolean {
+  return value >= -tolerance && value <= 1 + tolerance
+}
+
+function dedupeIntersections(
+  intersections: Intersection2D[],
+  tolerance: number
+): Intersection2D[] {
   const deduped: Intersection2D[] = []
 
   for (const intersection of intersections) {
@@ -669,26 +522,99 @@ function dedupeIntersections(intersections: Intersection2D[]): Intersection2D[] 
     }
 
     if (intersection.points.length === 1) {
-      const point = intersection.points[0]
+      const feature = intersection.points[0]
 
-      if (deduped.some((existing) => containsPoint(existing, point))) {
+      if (feature instanceof Segment2D) {
+        if (deduped.some((existing) => containsSegment(existing, feature, tolerance))) {
+          continue
+        }
+      } else if (deduped.some((existing) => containsPoint(existing, feature, tolerance))) {
         continue
       }
-    } else if (deduped.some((existing) => samePolyline(existing.points, intersection.points))) {
-      continue
+    } else if (isVectorPointList(intersection.points)) {
+      const currentPoints = intersection.points
+
+      if (deduped.some((existing) =>
+        isVectorPointList(existing.points) &&
+        samePolyline(existing.points, currentPoints, tolerance)
+      )) {
+        continue
+      }
     }
 
     deduped.push(intersection)
   }
 
-  return deduped.length ? deduped : undefined
+  return deduped
 }
 
-function containsPoint(intersection: Intersection2D, point: Vector2): boolean {
-  return intersection.points.some((existing) => Vector2.distanceToSquared(existing, point) <= 1e-10)
+function flattenIntersections(intersections: Intersection2D[]): Intersection2D {
+  const points: (Vector2 | Segment2D)[] = []
+  const normals: Vector2[] = []
+
+  for (const intersection of intersections) {
+    points.push(...intersection.points.map((point) => point.clone()))
+    normals.push(...intersection.normals.map((normal) => normal.clone()))
+  }
+
+  return new Intersection2D(points, normals)
 }
 
-function samePolyline(pointsA: Vector2[], pointsB: Vector2[]): boolean {
+function containsPoint(
+  intersection: Intersection2D,
+  point: Vector2,
+  tolerance: number
+): boolean {
+  if (!isVectorPointList(intersection.points)) {
+    return false
+  }
+
+  return intersection.points.some(
+    (existing) => Vector2.distanceToSquared(existing, point) <= tolerance * tolerance
+  )
+}
+
+function containsSegment(
+  intersection: Intersection2D,
+  segment: Segment2D,
+  tolerance: number
+): boolean {
+  if (intersection.points.length !== 1) {
+    return false
+  }
+
+  const existing = intersection.points[0]
+
+  if (!(existing instanceof Segment2D)) {
+    return false
+  }
+
+  return sameSegment(existing, segment, tolerance)
+}
+
+function isVectorPointList(points: (Vector2 | Segment2D)[]): points is Vector2[] {
+  return points.every((point) => point instanceof Vector2)
+}
+
+function sameSegment(a: Segment2D, b: Segment2D, tolerance: number): boolean {
+  const toleranceSq = tolerance * tolerance
+
+  return (
+    (
+      Vector2.distanceToSquared(a.start, b.start) <= toleranceSq &&
+      Vector2.distanceToSquared(a.end, b.end) <= toleranceSq
+    ) || (
+      Vector2.distanceToSquared(a.start, b.end) <= toleranceSq &&
+      Vector2.distanceToSquared(a.end, b.start) <= toleranceSq
+    )
+  )
+}
+
+function samePolyline(
+  pointsA: Vector2[],
+  pointsB: Vector2[],
+  tolerance: number
+): boolean {
   if (pointsA.length !== pointsB.length) {
     return false
   }
@@ -697,50 +623,14 @@ function samePolyline(pointsA: Vector2[], pointsB: Vector2[]): boolean {
   let reverse = true
 
   for (let i = 0; i < pointsA.length; i++) {
-    if (Vector2.distanceToSquared(pointsA[i], pointsB[i]) > 1e-10) {
+    if (Vector2.distanceToSquared(pointsA[i], pointsB[i]) > tolerance * tolerance) {
       forward = false
     }
 
-    if (Vector2.distanceToSquared(pointsA[i], pointsB[pointsB.length - 1 - i]) > 1e-10) {
+    if (Vector2.distanceToSquared(pointsA[i], pointsB[pointsB.length - 1 - i]) > tolerance * tolerance) {
       reverse = false
     }
   }
 
   return forward || reverse
-}
-
-function normalizeAngle(angle: number): number {
-  let result = angle % TAU
-
-  if (result < 0) {
-    result += TAU
-  }
-
-  return result
-}
-
-function deltaAngle(start: number, end: number): number {
-  let delta = normalizeAngle(end) - normalizeAngle(start)
-
-  if (delta < 0) {
-    delta += TAU
-  }
-
-  return delta
-}
-
-function overlapSpan(interval: AngleInterval): number {
-  return Math.max(0, interval.end - interval.start)
-}
-
-function isWithinUnitInterval(value: number): boolean {
-  return value >= -EPSILON && value <= 1 + EPSILON
-}
-
-function clamp01(value: number): number {
-  return Math.max(0, Math.min(1, value))
-}
-
-function cross2d(a: Vector2, b: Vector2): number {
-  return a.x * b.y - a.y * b.x
 }

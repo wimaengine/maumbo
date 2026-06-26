@@ -7,43 +7,43 @@ export function linesIntersection(
   a: Line2,
   b: Line2,
   transform: Affine2,
-  _invTransform: Affine2
-): Intersection2D[] | undefined {
-  return intersectShapes2d(a, b, transform)
+  tolerance = 1e-8
+): Intersection2D | undefined {
+  return intersectShapes2d(a, b, transform, tolerance)
 }
 
 export function lineRectangleIntersection(
   a: Line2,
   b: Rectangle,
   transform: Affine2,
-  _invTransform: Affine2
-): Intersection2D[] | undefined {
-  return intersectShapes2d(a, b, transform)
+  tolerance = 1e-8
+): Intersection2D | undefined {
+  return intersectShapes2d(a, b, transform, tolerance)
 }
 
 export function lineTriangleIntersection(
   a: Line2,
   b: Triangle,
   transform: Affine2,
-  _invTransform: Affine2
-): Intersection2D[] | undefined {
-  return intersectShapes2d(a, b, transform)
+  tolerance = 1e-8
+): Intersection2D | undefined {
+  return intersectShapes2d(a, b, transform, tolerance)
 }
 
 export function lineCapsuleIntersection(
   a: Line2,
   b: Capsule,
   transform: Affine2,
-  _invTransform: Affine2
-): Intersection2D[] | undefined {
-  return intersectShapes2d(a, b, transform)
+  tolerance = 1e-8
+): Intersection2D | undefined {
+  return intersectShapes2d(a, b, transform, tolerance)
 }
 
 export function lineConvexPolygonIntersection(
   a: Line2,
   b: ConvexPolygon,
   transform: Affine2,
-  _invTransform: Affine2
-): Intersection2D[] | undefined {
-  return intersectShapes2d(a, b, transform)
+  tolerance = 1e-8
+): Intersection2D | undefined {
+  return intersectShapes2d(a, b, transform, tolerance)
 }

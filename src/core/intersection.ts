@@ -7,14 +7,15 @@ export const IntersectionType2D = {
 } as const
 export class Intersection2D {
   points: (Vector2 | Segment2D)[] = []
+  // Index-aligned with `points`.
   normals: Vector2[] = []
 
   constructor(
     points: (Vector2 | Segment2D)[],
-    normal: Vector2[]
+    normals: Vector2[]
   ) {
     this.points = points
-    this.normals = normal
+    this.normals = normals
   }
 
   clone(): Intersection2D {
@@ -33,6 +34,8 @@ export class Intersection2D {
         Affine2.transform(transform, e.end, e.end)
       }
     })
-    this.normals.forEach(e => { Affine2.transform(transform, e, e) })
+    this.normals.forEach(e => {
+      Affine2.transformWithoutTranslation(transform, e, e)
+    })
   }
 }

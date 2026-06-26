@@ -8,7 +8,7 @@ test("lineCircleIntersection: returns undefined when the shapes are disjoint", (
   transform.x = -3
   transform.y = -3
 
-  strictEqual(lineCircleIntersection(new Line2(3), new Circle(1), transform, Affine2.copy(transform).invert()), undefined)
+  strictEqual(lineCircleIntersection(new Line2(3), new Circle(1), transform), undefined)
 })
 
 test("lineCircleIntersection: returns one point on a tangency", () => {
@@ -16,15 +16,13 @@ test("lineCircleIntersection: returns one point on a tangency", () => {
   transform.x = -3
   transform.y = -1
 
-  const intersections = lineCircleIntersection(new Line2(3), new Circle(1), transform, Affine2.copy(transform).invert())
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[0].points[0].x, -3)
-  strictEqual(intersections[0].points[0].y, 0)
-  strictEqual(intersections[0].normal.x, 0)
-  strictEqual(intersections[0].normal.y, -1)
-  strictEqual(intersections[0].tangent.x, 1)
-  strictEqual(intersections[0].tangent.y, 0)
+  const intersections = lineCircleIntersection(new Line2(3), new Circle(1), transform)
+  strictEqual(intersections.points.length, 1)
+  strictEqual(intersections.normals.length, 1)
+  strictEqual(intersections.points[0].x, -3)
+  strictEqual(intersections.points[0].y, 0)
+  strictEqual(intersections.normals[0].x, 0)
+  strictEqual(intersections.normals[0].y, -1)
 })
 
 test("lineCircleIntersection: returns the two line-circle boundary points", () => {
@@ -32,21 +30,15 @@ test("lineCircleIntersection: returns the two line-circle boundary points", () =
   const line = new Line2(10)
   const transform = Affine2.identity()
 
-  const intersections = lineCircleIntersection(line, circle, transform, Affine2.copy(transform).invert())
-  strictEqual(Array.isArray(intersections), true)
-  strictEqual(intersections.length, 2)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(intersections[0].points[0].x, -5)
-  strictEqual(intersections[0].points[0].y, 0)
-  strictEqual(intersections[1].points[0].x, 5)
-  strictEqual(intersections[1].points[0].y, 0)
-  strictEqual(intersections[0].normal.x, 0)
-  strictEqual(intersections[0].normal.y, -1)
-  strictEqual(intersections[0].tangent.x, 1)
-  strictEqual(intersections[0].tangent.y, 0)
-  strictEqual(intersections[1].normal.x, 0)
-  strictEqual(intersections[1].normal.y, -1)
-  strictEqual(intersections[1].tangent.x, 1)
-  strictEqual(intersections[1].tangent.y, 0)
+  const intersections = lineCircleIntersection(line, circle, transform)
+  strictEqual(intersections.points.length, 2)
+  strictEqual(intersections.normals.length, 2)
+  strictEqual(intersections.points[0].x, -5)
+  strictEqual(intersections.points[0].y, 0)
+  strictEqual(intersections.points[1].x, 5)
+  strictEqual(intersections.points[1].y, 0)
+  strictEqual(intersections.normals[0].x, 0)
+  strictEqual(intersections.normals[0].y, -1)
+  strictEqual(intersections.normals[1].x, 0)
+  strictEqual(intersections.normals[1].y, -1)
 })

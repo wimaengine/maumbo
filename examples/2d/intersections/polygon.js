@@ -220,7 +220,7 @@ function circlePolygon(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersection = getShape2Intersections(rect2, rect1, transformB, transformA)
+  const intersection = getShape2Intersections(rect1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)
@@ -251,7 +251,7 @@ function circlePolygon2(gizmo, time) {
     .rotate(Rotary.fromAngle(elapsed * 0.4))
     .translate(center)
   
-  const intersection = getShape2Intersections(rect2, rect1, transformA, transformB)
+  const intersection = getShape2Intersections(rect1, rect2, transformA, transformB)
   
   gizmo
     .setTransform(transformA)

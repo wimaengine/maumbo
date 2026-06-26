@@ -1,7 +1,12 @@
 import test from "node:test"
 import { strictEqual } from "node:assert"
 import { Affine2, fuzzyEqual } from "hisabati"
-import { Capsule, capsuleCircleIntersection, Circle } from "../../dist/index.module.js"
+import {
+  Capsule,
+  Circle,
+  Intersection2D,
+  capsuleCircleIntersection
+} from "../../dist/index.module.js"
 
 test("capsuleCircleIntersection: returns the capsule side crossing points", () => {
   const capsule = new Capsule(1, 2)
@@ -9,23 +14,19 @@ test("capsuleCircleIntersection: returns the capsule side crossing points", () =
   const transform = Affine2.identity()
   transform.x = 1.5
 
-  const intersections = capsuleCircleIntersection(capsule, circle, transform, Affine2.copy(transform).invert())
-  strictEqual(Array.isArray(intersections), true)
-  strictEqual(intersections.length, 2)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].points[0].x, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].points[0].y, -0.8660254037844386, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].points[0].x, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].points[0].y, 0.8660254037844386, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].tangent.x, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].tangent.y, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.x, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].tangent.x, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].tangent.y, 1, 1e-10), true)
+  const intersection = capsuleCircleIntersection(capsule, circle, transform)
+  strictEqual(intersection instanceof Intersection2D, true)
+  strictEqual(intersection.points.length, 2)
+  strictEqual(intersection.normals.length, 2)
+
+  strictEqual(fuzzyEqual(intersection.points[0].x, 1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.points[0].y, -0.8660254037844386, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.points[1].x, 1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.points[1].y, 0.8660254037844386, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[0].x, 1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[0].y, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[1].x, 1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[1].y, 0, 1e-10), true)
 })
 
 test("capsuleCircleIntersection: returns undefined when the shapes are disjoint", () => {
@@ -34,7 +35,7 @@ test("capsuleCircleIntersection: returns undefined when the shapes are disjoint"
   transform.y = -3
 
   strictEqual(
-    capsuleCircleIntersection(new Capsule(1, 2), new Circle(1), transform, Affine2.copy(transform).invert()),
+    capsuleCircleIntersection(new Capsule(1, 2), new Circle(1), transform),
     undefined
   )
 })
@@ -43,7 +44,7 @@ test("capsuleCircleIntersection: returns undefined when one shape contains the o
   const transform = Affine2.identity()
 
   strictEqual(
-    capsuleCircleIntersection(new Capsule(3, 4), new Circle(0.5), transform, Affine2.copy(transform).invert()),
+    capsuleCircleIntersection(new Capsule(3, 4), new Circle(0.5), transform),
     undefined
   )
 })
@@ -53,54 +54,42 @@ test("capsuleCircleIntersection: returns one point on a tangency", () => {
   transform.x = -2
   transform.y = -2
 
-  const intersections = capsuleCircleIntersection(
+  const intersection = capsuleCircleIntersection(
     new Capsule(1, 2),
     new Circle(1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].points[0].x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].points[0].y, -2, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].tangent.x, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].tangent.y, -1, 1e-10), true)
+  strictEqual(intersection instanceof Intersection2D, true)
+  strictEqual(intersection.points.length, 1)
+  strictEqual(intersection.normals.length, 1)
+  strictEqual(fuzzyEqual(intersection.points[0].x, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.points[0].y, -2, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[0].x, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[0].y, 0, 1e-10), true)
 })
 
 test("capsuleCircleIntersection: returns more than two points when the circle crosses the capsule caps and side", () => {
   const transform = Affine2.identity()
   transform.y = -2
 
-  const intersections = capsuleCircleIntersection(
+  const intersection = capsuleCircleIntersection(
     new Capsule(1, 2),
     new Circle(1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 3)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(intersections[2].points.length > 10, true)
-  strictEqual(fuzzyEqual(intersections[0].points[0].x, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].points[0].y, -2, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].tangent.x, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].tangent.y, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].points[0].x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].points[0].y, -2, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].tangent.x, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].tangent.y, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[2].points[0].x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[2].points[0].y, -2, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[2].points[intersections[2].points.length - 1].x, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[2].points[intersections[2].points.length - 1].y, -2, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[2].normal.x, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[2].normal.y, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[2].tangent.x, 1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[2].tangent.y, 0, 1e-10), true)
+  strictEqual(intersection instanceof Intersection2D, true)
+  strictEqual(intersection.points.length > 10, true)
+  strictEqual(intersection.normals.length, intersection.points.length)
+  strictEqual(fuzzyEqual(intersection.points[0].x, 1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.points[0].y, -2, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.points[1].x, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.points[1].y, -2, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[0].x, 1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[0].y, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[1].x, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[1].y, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[3].x, -0.9807852804032304, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[3].y, -0.19509032201612841, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[intersection.normals.length - 1].x, 1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersection.normals[intersection.normals.length - 1].y, 0, 1e-10), true)
 })

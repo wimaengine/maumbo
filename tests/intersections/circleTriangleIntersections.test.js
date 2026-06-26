@@ -9,7 +9,7 @@ test("circleTriangleIntersections: returns undefined when the shapes are disjoin
   transform.y = -3
 
   strictEqual(
-    circleTriangleIntersections(new Circle(1), new Triangle(1, 1), transform, Affine2.copy(transform).invert()),
+    circleTriangleIntersections(new Circle(1), new Triangle(1, 1), transform),
     undefined
   )
 })
@@ -18,7 +18,7 @@ test("circleTriangleIntersections: returns undefined when one shape contains the
   const transform = Affine2.identity()
 
   strictEqual(
-    circleTriangleIntersections(new Circle(3), new Triangle(0.5, 0.5), transform, Affine2.copy(transform).invert()),
+    circleTriangleIntersections(new Circle(3), new Triangle(0.5, 0.5), transform),
     undefined
   )
 })
@@ -32,15 +32,14 @@ test("circleTriangleIntersections: returns one point on a tangency", () => {
   const intersections = circleTriangleIntersections(
     new Circle(1),
     new Triangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].points[0].x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].points[0].y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, 0, 1e-10), true)
+  strictEqual(intersections.points.length, 1)
+  strictEqual(intersections.normals.length, 1)
+  strictEqual(fuzzyEqual(intersections.points[0].x, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.points[0].y, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].x, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].y, 0, 1e-10), true)
 })
 
 test("circleTriangleIntersections: returns two points when the circle crosses the triangle", () => {
@@ -52,16 +51,14 @@ test("circleTriangleIntersections: returns two points when the circle crosses th
   const intersections = circleTriangleIntersections(
     new Circle(1),
     new Triangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 2)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, -0.7487, 1e-4), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, -0.6629, 1e-4), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.x, -0.9216, 1e-4), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.y, -0.388, 1e-4), true)
+  strictEqual(intersections.points.length, 2)
+  strictEqual(intersections.normals.length, 2)
+  strictEqual(fuzzyEqual(intersections.normals[0].x, -0.7487, 1e-4), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].y, -0.6629, 1e-4), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].x, -0.9216, 1e-4), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].y, -0.388, 1e-4), true)
 })
 
 test("circleTriangleIntersections: returns more than two points when the circle crosses multiple triangle edges", () => {
@@ -72,16 +69,12 @@ test("circleTriangleIntersections: returns more than two points when the circle 
   const intersections = circleTriangleIntersections(
     new Circle(1),
     new Triangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 4)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(intersections[2].points.length, 1)
-  strictEqual(intersections[3].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, -1, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.x, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].normal.y, 1, 1e-10), true)
+  strictEqual(intersections.points.length, 4)
+  strictEqual(intersections.normals.length, 4)
+  strictEqual(fuzzyEqual(intersections.normals[0].x, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].y, -1, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].x, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[1].y, 1, 1e-10), true)
 })

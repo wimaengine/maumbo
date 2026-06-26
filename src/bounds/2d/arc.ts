@@ -1,4 +1,4 @@
-import { Affine2, Vector2 } from "hisabati"
+import { Affine2, TAU, Vector2 } from "hisabati"
 import type { Rotary } from "hisabati"
 
 export interface ArcBound2DOptions {
@@ -72,6 +72,17 @@ export class ArcBound2D {
     const radius = bound.radius
     const startAngle = bound.startAngle
     const endAngle = bound.endAngle
+
+    Affine2.transform(affine, new Vector2(centerX, centerY), out.center)
+    out.radius = radius
+
+    if (isFullCircleSpan(startAngle, endAngle)) {
+      out.startAngle = 0
+      out.endAngle = TAU
+
+      return out
+    }
+
     const start = new Vector2(
       centerX + Math.cos(startAngle) * radius,
       centerY + Math.sin(startAngle) * radius
@@ -81,11 +92,8 @@ export class ArcBound2D {
       centerY + Math.sin(endAngle) * radius
     )
 
-    Affine2.transform(affine, new Vector2(centerX, centerY), out.center)
     Affine2.transform(affine, start, start)
     Affine2.transform(affine, end, end)
-
-    out.radius = radius
     const startRelative = Vector2.subtract(start, out.center, new Vector2())
     const endRelative = Vector2.subtract(end, out.center, new Vector2())
     out.startAngle = startRelative.x === 0 && startRelative.y === 0 ? startAngle : Vector2.toAngle(startRelative)
@@ -93,4 +101,9 @@ export class ArcBound2D {
 
     return out
   }
+}
+
+function isFullCircleSpan(startAngle: number, endAngle: number): boolean {
+  const span = Math.abs(endAngle - startAngle)
+  return Math.abs(span - TAU) <= 1e-8
 }

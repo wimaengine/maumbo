@@ -22,7 +22,7 @@ test("polygonIntersections: returns undefined when the polygons are disjoint", (
   transform.x = -3
   transform.y = -3
 
-  strictEqual(polygonIntersections(a, b, transform, Affine2.copy(transform).invert()), undefined)
+  strictEqual(polygonIntersections(a, b, transform), undefined)
 })
 
 test("polygonIntersections: returns undefined when one polygon contains the other", () => {
@@ -42,7 +42,7 @@ test("polygonIntersections: returns undefined when one polygon contains the othe
   ])
   const transform = Affine2.identity()
 
-  strictEqual(polygonIntersections(a, b, transform, Affine2.copy(transform).invert()), undefined)
+  strictEqual(polygonIntersections(a, b, transform), undefined)
 })
 
 test("polygonIntersections: returns one point on a vertex touch", () => {
@@ -63,9 +63,9 @@ test("polygonIntersections: returns one point on a vertex touch", () => {
   const transform = Affine2.identity()
   transform.x = -3
 
-  const intersections = polygonIntersections(a, b, transform, Affine2.copy(transform).invert())
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
+  const intersection = polygonIntersections(a, b, transform)
+  strictEqual(intersection.points.length, 1)
+  strictEqual(intersection.normals.length, 1)
 })
 
 test("polygonIntersections: returns two points when the polygons cross", () => {
@@ -87,10 +87,9 @@ test("polygonIntersections: returns two points when the polygons cross", () => {
   transform.x = -2.5
   transform.y = -1
 
-  const intersections = polygonIntersections(a, b, transform, Affine2.copy(transform).invert())
-  strictEqual(intersections.length, 2)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
+  const intersection = polygonIntersections(a, b, transform)
+  strictEqual(intersection.points.length, 2)
+  strictEqual(intersection.normals.length, 2)
 })
 
 test("polygonIntersections: returns more than two points when the polygons overlap on multiple edges", () => {
@@ -113,10 +112,7 @@ test("polygonIntersections: returns more than two points when the polygons overl
   transform.x = -0.5
   transform.y = -0.5
 
-  const intersections = polygonIntersections(a, b, transform, Affine2.copy(transform).invert())
-  strictEqual(intersections.length, 4)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(intersections[2].points.length, 1)
-  strictEqual(intersections[3].points.length, 1)
+  const intersection = polygonIntersections(a, b, transform)
+  strictEqual(intersection.points.length, 4)
+  strictEqual(intersection.normals.length, 4)
 })

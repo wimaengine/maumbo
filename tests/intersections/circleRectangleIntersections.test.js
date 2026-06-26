@@ -7,9 +7,8 @@ test("circleRectangleIntersections: returns undefined when the circle is fully c
   const circle = new Circle(0.5)
   const rectangle = new Rectangle(2, 2)
   const transform = Affine2.identity()
-  const invTransform = Affine2.copy(transform).invert()
 
-  strictEqual(circleRectangleIntersections(circle, rectangle, transform, invTransform), undefined)
+  strictEqual(circleRectangleIntersections(circle, rectangle, transform), undefined)
 })
 
 test("circleRectangleIntersections: returns undefined when the shapes are disjoint", () => {
@@ -18,7 +17,7 @@ test("circleRectangleIntersections: returns undefined when the shapes are disjoi
   transform.y = -3
 
   strictEqual(
-    circleRectangleIntersections(new Circle(1), new Rectangle(1, 1), transform, Affine2.copy(transform).invert()),
+    circleRectangleIntersections(new Circle(1), new Rectangle(1, 1), transform),
     undefined
   )
 })
@@ -31,17 +30,14 @@ test("circleRectangleIntersections: returns one point on a tangency", () => {
   const intersections = circleRectangleIntersections(
     new Circle(1),
     new Rectangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[0].points[0].x, -1)
-  strictEqual(fuzzyEqual(intersections[0].points[0].y, 0, 1e-10), true)
-  strictEqual(intersections[0].normal.x, -1)
-  strictEqual(fuzzyEqual(intersections[0].normal.y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].tangent.x, 0, 1e-10), true)
-  strictEqual(intersections[0].tangent.y, -1)
+  strictEqual(intersections.points.length, 1)
+  strictEqual(intersections.normals.length, 1)
+  strictEqual(intersections.points[0].x, -1)
+  strictEqual(fuzzyEqual(intersections.points[0].y, 0, 1e-10), true)
+  strictEqual(intersections.normals[0].x, -1)
+  strictEqual(fuzzyEqual(intersections.normals[0].y, 0, 1e-10), true)
 })
 
 test("circleRectangleIntersections: returns four points when the circle is inscribed in the rectangle", () => {
@@ -49,35 +45,23 @@ test("circleRectangleIntersections: returns four points when the circle is inscr
   const rectangle = new Rectangle(5, 5)
   const transform = Affine2.identity()
 
-  const intersections = circleRectangleIntersections(circle, rectangle, transform, Affine2.copy(transform).invert())
-  strictEqual(Array.isArray(intersections), true)
-  strictEqual(intersections.length, 4)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(intersections[2].points.length, 1)
-  strictEqual(intersections[3].points.length, 1)
-  strictEqual(fuzzyEqual(intersections[0].points[0].x, 0, 1e-10), true)
-  strictEqual(intersections[0].points[0].y, -5)
-  strictEqual(fuzzyEqual(intersections[0].normal.x, 0, 1e-10), true)
-  strictEqual(intersections[0].normal.y, -1)
-  strictEqual(intersections[0].tangent.x, 1)
-  strictEqual(fuzzyEqual(intersections[0].tangent.y, 0, 1e-10), true)
-  strictEqual(intersections[1].points[0].x, 5)
-  strictEqual(fuzzyEqual(intersections[1].points[0].y, 0, 1e-10), true)
-  strictEqual(intersections[1].normal.x, 1)
-  strictEqual(fuzzyEqual(intersections[1].normal.y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].tangent.x, 0, 1e-10), true)
-  strictEqual(intersections[1].tangent.y, 1)
-  strictEqual(fuzzyEqual(intersections[2].points[0].x, 0, 1e-10), true)
-  strictEqual(intersections[2].points[0].y, 5)
-  strictEqual(fuzzyEqual(intersections[2].normal.x, 0, 1e-10), true)
-  strictEqual(intersections[2].normal.y, 1)
-  strictEqual(intersections[2].tangent.x, -1)
-  strictEqual(fuzzyEqual(intersections[2].tangent.y, 0, 1e-10), true)
-  strictEqual(intersections[3].points[0].x, -5)
-  strictEqual(fuzzyEqual(intersections[3].points[0].y, 0, 1e-10), true)
-  strictEqual(intersections[3].normal.x, -1)
-  strictEqual(fuzzyEqual(intersections[3].normal.y, 0, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[3].tangent.x, 0, 1e-10), true)
-  strictEqual(intersections[3].tangent.y, -1)
+  const intersections = circleRectangleIntersections(circle, rectangle, transform)
+  strictEqual(intersections.points.length, 4)
+  strictEqual(intersections.normals.length, 4)
+  strictEqual(fuzzyEqual(intersections.points[0].x, 0, 1e-10), true)
+  strictEqual(intersections.points[0].y, -5)
+  strictEqual(fuzzyEqual(intersections.points[1].x, 5, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.points[1].y, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.points[2].x, 0, 1e-10), true)
+  strictEqual(intersections.points[2].y, 5)
+  strictEqual(intersections.points[3].x, -5)
+  strictEqual(fuzzyEqual(intersections.points[3].y, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[0].x, 0, 1e-10), true)
+  strictEqual(intersections.normals[0].y, -1)
+  strictEqual(intersections.normals[1].x, 1)
+  strictEqual(fuzzyEqual(intersections.normals[1].y, 0, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.normals[2].x, 0, 1e-10), true)
+  strictEqual(intersections.normals[2].y, 1)
+  strictEqual(intersections.normals[3].x, -1)
+  strictEqual(fuzzyEqual(intersections.normals[3].y, 0, 1e-10), true)
 })

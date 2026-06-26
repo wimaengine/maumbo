@@ -9,7 +9,7 @@ test("triangleIntersections: returns undefined when the triangles are disjoint",
   transform.y = -3
 
   strictEqual(
-    triangleIntersections(new Triangle(1, 1), new Triangle(1, 1), transform, Affine2.copy(transform).invert()),
+    triangleIntersections(new Triangle(1, 1), new Triangle(1, 1), transform),
     undefined
   )
 })
@@ -18,7 +18,7 @@ test("triangleIntersections: returns undefined when one triangle contains the ot
   const transform = Affine2.identity()
 
   strictEqual(
-    triangleIntersections(new Triangle(3, 3), new Triangle(0.5, 0.5), transform, Affine2.copy(transform).invert()),
+    triangleIntersections(new Triangle(3, 3), new Triangle(0.5, 0.5), transform),
     undefined
   )
 })
@@ -32,11 +32,10 @@ test("triangleIntersections: returns one point on a vertex touch", () => {
   const intersections = triangleIntersections(
     new Triangle(1, 1),
     new Triangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
+  strictEqual(intersections.points.length, 1)
+  strictEqual(intersections.normals.length, 1)
 })
 
 test("triangleIntersections: returns two points when the triangles cross", () => {
@@ -48,12 +47,10 @@ test("triangleIntersections: returns two points when the triangles cross", () =>
   const intersections = triangleIntersections(
     new Triangle(1, 1),
     new Triangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 2)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
+  strictEqual(intersections.points.length, 2)
+  strictEqual(intersections.normals.length, 2)
 })
 
 test("triangleIntersections: returns more than two points when the triangles overlap deeply", () => {
@@ -64,11 +61,8 @@ test("triangleIntersections: returns more than two points when the triangles ove
   const intersections = triangleIntersections(
     new Triangle(1, 1),
     new Triangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 3)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(intersections[2].points.length, 1)
+  strictEqual(intersections.points.length, 3)
+  strictEqual(intersections.normals.length, 3)
 })

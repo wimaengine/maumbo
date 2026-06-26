@@ -12,23 +12,18 @@ test("capsuleRectangleIntersection: returns the rectangle-side crossing points",
   const intersections = capsuleRectangleIntersection(
     capsule,
     rectangle,
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(Array.isArray(intersections), true)
-  strictEqual(intersections.length, 2)
-  strictEqual(intersections[0].points[0].x, 1)
-  strictEqual(intersections[0].points[0].y, -1)
-  strictEqual(intersections[1].points[0].x, 1)
-  strictEqual(intersections[1].points[0].y, 1)
-  strictEqual(intersections[0].normal.x, 1)
-  strictEqual(intersections[0].normal.y, 0)
-  strictEqual(intersections[0].tangent.x, 0)
-  strictEqual(intersections[0].tangent.y, 1)
-  strictEqual(intersections[1].normal.x, 1)
-  strictEqual(intersections[1].normal.y, 0)
-  strictEqual(intersections[1].tangent.x, 0)
-  strictEqual(intersections[1].tangent.y, 1)
+  strictEqual(intersections.points.length, 2)
+  strictEqual(intersections.normals.length, 2)
+  strictEqual(intersections.points[0].x, 1)
+  strictEqual(intersections.points[0].y, -1)
+  strictEqual(intersections.points[1].x, 1)
+  strictEqual(intersections.points[1].y, 1)
+  strictEqual(intersections.normals[0].x, 1)
+  strictEqual(intersections.normals[0].y, 0)
+  strictEqual(intersections.normals[1].x, 1)
+  strictEqual(intersections.normals[1].y, 0)
 })
 
 test("capsuleRectangleIntersection: returns undefined when the shapes are disjoint", () => {
@@ -37,7 +32,7 @@ test("capsuleRectangleIntersection: returns undefined when the shapes are disjoi
   transform.y = -3
 
   strictEqual(
-    capsuleRectangleIntersection(new Capsule(1, 2), new Rectangle(1, 1), transform, Affine2.copy(transform).invert()),
+    capsuleRectangleIntersection(new Capsule(1, 2), new Rectangle(1, 1), transform),
     undefined
   )
 })
@@ -46,7 +41,7 @@ test("capsuleRectangleIntersection: returns undefined when one shape contains th
   const transform = Affine2.identity()
 
   strictEqual(
-    capsuleRectangleIntersection(new Capsule(3, 4), new Rectangle(0.5, 0.5), transform, Affine2.copy(transform).invert()),
+    capsuleRectangleIntersection(new Capsule(3, 4), new Rectangle(0.5, 0.5), transform),
     undefined
   )
 })
@@ -59,17 +54,14 @@ test("capsuleRectangleIntersection: returns one point on a tangency", () => {
   const intersections = capsuleRectangleIntersection(
     new Capsule(1, 2),
     new Rectangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[0].points[0].x, -1)
-  strictEqual(intersections[0].points[0].y, -2)
-  strictEqual(intersections[0].normal.x, -1)
-  strictEqual(intersections[0].normal.y, 0)
-  strictEqual(intersections[0].tangent.x, 0)
-  strictEqual(intersections[0].tangent.y, -1)
+  strictEqual(intersections.points.length, 1)
+  strictEqual(intersections.normals.length, 1)
+  strictEqual(intersections.points[0].x, -1)
+  strictEqual(intersections.points[0].y, -2)
+  strictEqual(intersections.normals[0].x, -1)
+  strictEqual(intersections.normals[0].y, 0)
 })
 
 test("capsuleRectangleIntersection: returns four points when the rectangle crosses the capsule", () => {
@@ -77,35 +69,23 @@ test("capsuleRectangleIntersection: returns four points when the rectangle cross
   const rectangle = new Rectangle(2, 1)
   const transform = Affine2.identity()
 
-  const intersections = capsuleRectangleIntersection(capsule, rectangle, transform, Affine2.copy(transform).invert())
-  strictEqual(Array.isArray(intersections), true)
-  strictEqual(intersections.length, 4)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
-  strictEqual(intersections[2].points.length, 1)
-  strictEqual(intersections[3].points.length, 1)
-  strictEqual(intersections[0].points[0].x, 1)
-  strictEqual(intersections[0].points[0].y, -1)
-  strictEqual(intersections[0].normal.x, 1)
-  strictEqual(intersections[0].normal.y, 0)
-  strictEqual(intersections[0].tangent.x, 0)
-  strictEqual(intersections[0].tangent.y, 1)
-  strictEqual(intersections[1].points[0].x, 1)
-  strictEqual(intersections[1].points[0].y, 1)
-  strictEqual(intersections[1].normal.x, 1)
-  strictEqual(intersections[1].normal.y, 0)
-  strictEqual(intersections[1].tangent.x, 0)
-  strictEqual(intersections[1].tangent.y, 1)
-  strictEqual(intersections[2].points[0].x, -1)
-  strictEqual(intersections[2].points[0].y, -1)
-  strictEqual(intersections[2].normal.x, -1)
-  strictEqual(intersections[2].normal.y, 0)
-  strictEqual(intersections[2].tangent.x, 0)
-  strictEqual(intersections[2].tangent.y, -1)
-  strictEqual(intersections[3].points[0].x, -1)
-  strictEqual(intersections[3].points[0].y, 1)
-  strictEqual(intersections[3].normal.x, -1)
-  strictEqual(intersections[3].normal.y, 0)
-  strictEqual(intersections[3].tangent.x, 0)
-  strictEqual(intersections[3].tangent.y, -1)
+  const intersections = capsuleRectangleIntersection(capsule, rectangle, transform)
+  strictEqual(intersections.points.length, 4)
+  strictEqual(intersections.normals.length, 4)
+  strictEqual(intersections.points[0].x, 1)
+  strictEqual(intersections.points[0].y, -1)
+  strictEqual(intersections.points[1].x, 1)
+  strictEqual(intersections.points[1].y, 1)
+  strictEqual(intersections.points[2].x, -1)
+  strictEqual(intersections.points[2].y, -1)
+  strictEqual(intersections.points[3].x, -1)
+  strictEqual(intersections.points[3].y, 1)
+  strictEqual(intersections.normals[0].x, 1)
+  strictEqual(intersections.normals[0].y, 0)
+  strictEqual(intersections.normals[1].x, 1)
+  strictEqual(intersections.normals[1].y, 0)
+  strictEqual(intersections.normals[2].x, -1)
+  strictEqual(intersections.normals[2].y, 0)
+  strictEqual(intersections.normals[3].x, -1)
+  strictEqual(intersections.normals[3].y, 0)
 })

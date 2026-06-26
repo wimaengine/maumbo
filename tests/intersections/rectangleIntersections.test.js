@@ -9,7 +9,7 @@ test("rectangleIntersections: returns undefined when the rectangles are disjoint
   transform.y = -3
 
   strictEqual(
-    rectangleIntersections(new Rectangle(1, 1), new Rectangle(1, 1), transform, Affine2.copy(transform).invert()),
+    rectangleIntersections(new Rectangle(1, 1), new Rectangle(1, 1), transform),
     undefined
   )
 })
@@ -18,7 +18,7 @@ test("rectangleIntersections: returns undefined when one rectangle contains the 
   const transform = Affine2.identity()
 
   strictEqual(
-    rectangleIntersections(new Rectangle(3, 3), new Rectangle(0.5, 0.5), transform, Affine2.copy(transform).invert()),
+    rectangleIntersections(new Rectangle(3, 3), new Rectangle(0.5, 0.5), transform),
     undefined
   )
 })
@@ -31,11 +31,10 @@ test("rectangleIntersections: returns one point on a corner touch", () => {
   const intersections = rectangleIntersections(
     new Rectangle(1, 1),
     new Rectangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
+  strictEqual(intersections.points.length, 1)
+  strictEqual(intersections.normals.length, 1)
 })
 
 test("rectangleIntersections: returns two points when the rectangles cross one side", () => {
@@ -46,12 +45,10 @@ test("rectangleIntersections: returns two points when the rectangles cross one s
   const intersections = rectangleIntersections(
     new Rectangle(1, 1),
     new Rectangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 2)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 2)
+  strictEqual(intersections.points.length, 3)
+  strictEqual(intersections.normals.length, intersections.points.length)
 })
 
 test("rectangleIntersections: returns more than two points when the rectangles coincide", () => {
@@ -60,12 +57,8 @@ test("rectangleIntersections: returns more than two points when the rectangles c
   const intersections = rectangleIntersections(
     new Rectangle(1, 1),
     new Rectangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 4)
-  strictEqual(intersections[0].points.length, 2)
-  strictEqual(intersections[1].points.length, 2)
-  strictEqual(intersections[2].points.length, 2)
-  strictEqual(intersections[3].points.length, 2)
+  strictEqual(intersections.points.length, 8)
+  strictEqual(intersections.normals.length, intersections.points.length)
 })

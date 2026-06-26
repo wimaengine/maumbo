@@ -879,7 +879,7 @@ export function drawIntersections(gizmo, intersection, transformA) {
 
   for (let i = 0; i < worldIntersection.points.length; i++) {
     const pointOrSegment = worldIntersection.points[i]
-    const normal = worldIntersection.normals[i] ?? worldIntersection.normals[0]
+    const normal = worldIntersection.normals[i]
     const anchor = new Vector2()
 
     if (pointOrSegment instanceof Vector2) {
@@ -899,9 +899,17 @@ export function drawIntersections(gizmo, intersection, transformA) {
       continue
     }
 
+    const normalLength = normal.magnitude()
+    const normalDirection =
+      normalLength === 0 ? Vector2.X.clone() : normal.clone().normalize()
+
     gizmo
       .reset()
-      .line(anchor, Vector2.add(anchor, normal), Color.RED)
+      .translate(anchor.x, anchor.y)
+      .arrow(normalDirection, normalLength + 10, Color.RED)
+
+    gizmo
+      .reset()
       .line(anchor, Vector2.add(anchor, Vector2.normal(normal)), Color.YELLOW)
   }
 

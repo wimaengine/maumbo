@@ -16,7 +16,7 @@ test("polygonRectangleIntersections: returns undefined when the shapes are disjo
   transform.x = -3
   transform.y = -3
 
-  strictEqual(polygonRectangleIntersections(polygon, rectangle, transform, Affine2.copy(transform).invert()), undefined)
+  strictEqual(polygonRectangleIntersections(polygon, rectangle, transform), undefined)
 })
 
 test("polygonRectangleIntersections: returns undefined when one shape contains the other", () => {
@@ -30,7 +30,7 @@ test("polygonRectangleIntersections: returns undefined when one shape contains t
   const rectangle = new Rectangle(0.5, 0.5)
   const transform = Affine2.identity()
 
-  strictEqual(polygonRectangleIntersections(polygon, rectangle, transform, Affine2.copy(transform).invert()), undefined)
+  strictEqual(polygonRectangleIntersections(polygon, rectangle, transform), undefined)
 })
 
 test("polygonRectangleIntersections: returns one point on a corner touch", () => {
@@ -46,9 +46,9 @@ test("polygonRectangleIntersections: returns one point on a corner touch", () =>
   transform.x = -2.5
   transform.y = -0.5
 
-  const intersections = polygonRectangleIntersections(polygon, rectangle, transform, Affine2.copy(transform).invert())
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
+  const intersections = polygonRectangleIntersections(polygon, rectangle, transform)
+  strictEqual(intersections.points.length, 1)
+  strictEqual(intersections.normals.length, 1)
 })
 
 test("polygonRectangleIntersections: returns two points when the rectangle crosses the polygon", () => {
@@ -65,10 +65,9 @@ test("polygonRectangleIntersections: returns two points when the rectangle cross
   transform.x = -2.5
   transform.y = -0.5
 
-  const intersections = polygonRectangleIntersections(polygon, rectangle, transform, Affine2.copy(transform).invert())
-  strictEqual(intersections.length, 2)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
+  const intersections = polygonRectangleIntersections(polygon, rectangle, transform)
+  strictEqual(intersections.points.length, 2)
+  strictEqual(intersections.normals.length, 2)
 })
 
 test("polygonRectangleIntersections: returns more than two points when the shapes overlap across multiple edges", () => {
@@ -84,9 +83,7 @@ test("polygonRectangleIntersections: returns more than two points when the shape
   transform.rotate(Rotary.fromAngle(Math.PI / 2))
   transform.x = -1.5
 
-  const intersections = polygonRectangleIntersections(polygon, rectangle, transform, Affine2.copy(transform).invert())
-  strictEqual(intersections.length, 3)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 2)
-  strictEqual(intersections[2].points.length, 1)
+  const intersections = polygonRectangleIntersections(polygon, rectangle, transform)
+  strictEqual(intersections.points.length, 4)
+  strictEqual(intersections.normals.length, intersections.points.length)
 })

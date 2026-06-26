@@ -9,7 +9,7 @@ test("triangleRectangleIntersections: returns undefined when the shapes are disj
   transform.y = -3
 
   strictEqual(
-    triangleRectangleIntersections(new Triangle(1, 1), new Rectangle(1, 1), transform, Affine2.copy(transform).invert()),
+    triangleRectangleIntersections(new Triangle(1, 1), new Rectangle(1, 1), transform),
     undefined
   )
 })
@@ -18,7 +18,7 @@ test("triangleRectangleIntersections: returns undefined when one shape contains 
   const transform = Affine2.identity()
 
   strictEqual(
-    triangleRectangleIntersections(new Triangle(3, 3), new Rectangle(0.5, 0.5), transform, Affine2.copy(transform).invert()),
+    triangleRectangleIntersections(new Triangle(3, 3), new Rectangle(0.5, 0.5), transform),
     undefined
   )
 })
@@ -31,11 +31,10 @@ test("triangleRectangleIntersections: returns one point on a corner touch", () =
   const intersections = triangleRectangleIntersections(
     new Triangle(1, 1),
     new Rectangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 1)
-  strictEqual(intersections[0].points.length, 1)
+  strictEqual(intersections.points.length, 1)
+  strictEqual(intersections.normals.length, 1)
 })
 
 test("triangleRectangleIntersections: returns two points when the triangle crosses the rectangle", () => {
@@ -47,12 +46,10 @@ test("triangleRectangleIntersections: returns two points when the triangle cross
   const intersections = triangleRectangleIntersections(
     new Triangle(1, 1),
     new Rectangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 2)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 1)
+  strictEqual(intersections.points.length, 2)
+  strictEqual(intersections.normals.length, 2)
 })
 
 test("triangleRectangleIntersections: returns more than two points when the shapes overlap across multiple sides", () => {
@@ -63,11 +60,8 @@ test("triangleRectangleIntersections: returns more than two points when the shap
   const intersections = triangleRectangleIntersections(
     new Triangle(1, 1),
     new Rectangle(1, 1),
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(intersections.length, 3)
-  strictEqual(intersections[0].points.length, 1)
-  strictEqual(intersections[1].points.length, 2)
-  strictEqual(intersections[2].points.length, 1)
+  strictEqual(intersections.points.length, 4)
+  strictEqual(intersections.normals.length, intersections.points.length)
 })

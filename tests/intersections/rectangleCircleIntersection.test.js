@@ -12,13 +12,12 @@ test("circleRectangleIntersections: returns the rectangle-side crossing points",
   const intersections = circleRectangleIntersections(
     circle,
     rect,
-    transform,
-    Affine2.copy(transform).invert()
+    transform
   )
-  strictEqual(Array.isArray(intersections), true)
-  strictEqual(intersections.length, 2)
-  strictEqual(fuzzyEqual(intersections[0].points[0].x, 0.5, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[0].points[0].y, 0.8660254037844386, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].points[0].x, 0.5, 1e-10), true)
-  strictEqual(fuzzyEqual(intersections[1].points[0].y, -0.8660254037844386, 1e-10), true)
+  strictEqual(intersections.points.length, 2)
+  strictEqual(intersections.normals.length, 2)
+  strictEqual(fuzzyEqual(intersections.points[0].x, 0.5, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.points[0].y, 0.8660254037844386, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.points[1].x, 0.5, 1e-10), true)
+  strictEqual(fuzzyEqual(intersections.points[1].y, -0.8660254037844386, 1e-10), true)
 })
