@@ -48,7 +48,7 @@ export class Line2 implements Boundable2D, SupportMapped2d, PointQuery2D {
     }
   }
 
-  aabb2d(): BoundingBox2D {
+  localaabb2d(): BoundingBox2D {
     return new BoundingBox2D(
       -this.halfLength,
       0,
@@ -56,6 +56,27 @@ export class Line2 implements Boundable2D, SupportMapped2d, PointQuery2D {
       0
     )
   }
+
+  aabb2d(affine: Affine2): BoundingBox2D {
+    const start = Affine2.transform(
+      affine,
+      new Vector2(-this.halfLength, 0),
+      new Vector2()
+    )
+    const end = Affine2.transform(
+      affine,
+      new Vector2(this.halfLength, 0),
+      new Vector2()
+    )
+
+    return new BoundingBox2D(
+      Math.min(start.x, end.x),
+      Math.min(start.y, end.y),
+      Math.max(start.x, end.x),
+      Math.max(start.y, end.y)
+    )
+  }
+
   boundingCircle(): BoundingCircle {
     return new BoundingCircle(
       0,

@@ -66,7 +66,7 @@ export class Triangle implements SupportMapped2d, Boundable2D, PointQuery2D {
     return getPolygonFeature(this.getPoints(), direction)
   }
 
-  aabb2d(): BoundingBox2D {
+  localaabb2d(): BoundingBox2D {
     return new BoundingBox2D(
       -this.halfBase,
       -this.halfHeight,
@@ -74,6 +74,21 @@ export class Triangle implements SupportMapped2d, Boundable2D, PointQuery2D {
       this.halfHeight
     )
   }
+
+  aabb2d(affine: Affine2): BoundingBox2D {
+    const points = this.getPoints()
+    const a = Affine2.transform(affine, points[0], new Vector2())
+    const b = Affine2.transform(affine, points[1], new Vector2())
+    const c = Affine2.transform(affine, points[2], new Vector2())
+
+    return new BoundingBox2D(
+      Math.min(a.x, b.x, c.x),
+      Math.min(a.y, b.y, c.y),
+      Math.max(a.x, b.x, c.x),
+      Math.max(a.y, b.y, c.y)
+    )
+  }
+
   boundingCircle(): BoundingCircle {
     const {halfBase, halfHeight} = this
     return new BoundingCircle(

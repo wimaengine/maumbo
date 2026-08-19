@@ -60,7 +60,7 @@ export class ConvexPolygon implements SupportMapped2d, Boundable2D, PointQuery2D
     return getPolygonFeature(this.points, direction)
   }
 
-  aabb2d(): BoundingBox2D {
+  localaabb2d(): BoundingBox2D {
     const { points } = this
     let minX = Infinity, minY = Infinity;
     let maxX = -Infinity, maxY = -Infinity;
@@ -80,6 +80,26 @@ export class ConvexPolygon implements SupportMapped2d, Boundable2D, PointQuery2D
       maxX,
       maxY
     )
+  }
+
+  aabb2d(affine: Affine2): BoundingBox2D {
+    const { points } = this
+
+    let minX = Number.POSITIVE_INFINITY
+    let minY = Number.POSITIVE_INFINITY
+    let maxX = Number.NEGATIVE_INFINITY
+    let maxY = Number.NEGATIVE_INFINITY
+
+    for (let i = 0; i < points.length; i++) {
+      const point = Affine2.transform(affine, points[i], new Vector2())
+
+      if (point.x < minX) minX = point.x
+      if (point.y < minY) minY = point.y
+      if (point.x > maxX) maxX = point.x
+      if (point.y > maxY) maxY = point.y
+    }
+
+    return new BoundingBox2D(minX, minY, maxX, maxY)
   }
 
   boundingCircle(): BoundingCircle {

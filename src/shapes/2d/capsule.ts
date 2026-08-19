@@ -139,12 +139,26 @@ export class Capsule implements SupportMapped2d, Boundable2D, PointQuery2D {
     return points
   }
 
-  aabb2d(): BoundingBox2D {
+  localaabb2d(): BoundingBox2D {
     return new BoundingBox2D(
       -this.radius,
       -(this.radius + this.halfHeight),
       this.radius,
       (this.radius + this.halfHeight)
+    )
+  }
+
+  aabb2d(affine: Affine2): BoundingBox2D {
+    const axialExtentX = this.halfHeight * Math.abs(affine.c)
+    const axialExtentY = this.halfHeight * Math.abs(affine.d)
+    const capExtentX = this.radius * Math.hypot(affine.a, affine.c)
+    const capExtentY = this.radius * Math.hypot(affine.b, affine.d)
+
+    return new BoundingBox2D(
+      affine.x - axialExtentX - capExtentX,
+      affine.y - axialExtentY - capExtentY,
+      affine.x + axialExtentX + capExtentX,
+      affine.y + axialExtentY + capExtentY
     )
   }
 

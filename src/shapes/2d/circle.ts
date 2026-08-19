@@ -64,12 +64,24 @@ export class Circle implements Boundable2D, SupportMapped2d, PointQuery2D {
     }
   }
 
-  aabb2d(): BoundingBox2D {
+  localaabb2d(): BoundingBox2D {
     return new BoundingBox2D(
       -this.radius,
       -this.radius,
       this.radius,
       this.radius
+    )
+  }
+
+  aabb2d(affine: Affine2): BoundingBox2D {
+    const extentX = this.radius * Math.hypot(affine.a, affine.c)
+    const extentY = this.radius * Math.hypot(affine.b, affine.d)
+
+    return new BoundingBox2D(
+      affine.x - extentX,
+      affine.y - extentY,
+      affine.x + extentX,
+      affine.y + extentY
     )
   }
 

@@ -65,7 +65,7 @@ export class Rectangle implements SupportMapped2d, Boundable2D, PointQuery2D {
     return getPolygonFeature(this.getPoints(), direction)
   }
 
-  aabb2d(): BoundingBox2D {
+  localaabb2d(): BoundingBox2D {
     return new BoundingBox2D(
       -this.halfWidth,
       -this.halfHeight,
@@ -73,6 +73,19 @@ export class Rectangle implements SupportMapped2d, Boundable2D, PointQuery2D {
       this.halfHeight
     )
   }
+
+  aabb2d(affine: Affine2): BoundingBox2D {
+    const extentX = this.halfWidth * Math.abs(affine.a) + this.halfHeight * Math.abs(affine.c)
+    const extentY = this.halfWidth * Math.abs(affine.b) + this.halfHeight * Math.abs(affine.d)
+
+    return new BoundingBox2D(
+      affine.x - extentX,
+      affine.y - extentY,
+      affine.x + extentX,
+      affine.y + extentY
+    )
+  }
+
   boundingCircle(): BoundingCircle {
     const {halfHeight, halfWidth} = this
     return new BoundingCircle(

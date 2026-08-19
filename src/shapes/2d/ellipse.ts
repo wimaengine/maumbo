@@ -89,12 +89,24 @@ export class Ellipse implements Boundable2D, SupportMapped2d, PointQuery2D {
     }
   }
 
-  aabb2d(): BoundingBox2D {
+  localaabb2d(): BoundingBox2D {
     return new BoundingBox2D(
       -this.radiusX,
       -this.radiusY,
       this.radiusX,
       this.radiusY
+    )
+  }
+
+  aabb2d(affine: Affine2): BoundingBox2D {
+    const extentX = Math.hypot(this.radiusX * affine.a, this.radiusY * affine.c)
+    const extentY = Math.hypot(this.radiusX * affine.b, this.radiusY * affine.d)
+
+    return new BoundingBox2D(
+      affine.x - extentX,
+      affine.y - extentY,
+      affine.x + extentX,
+      affine.y + extentY
     )
   }
 
