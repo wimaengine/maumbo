@@ -60,7 +60,7 @@ export function GJKandEPA2d(
   }
 
   contacts.forEach((contact) => {
-    invTransform.transform(contact.pointB)
+    Affine2.transform(invTransform, contact.pointB, contact.pointB)
     contact.normalB = Affine2.transformWithoutTranslation(invTransform, contact.normalB)
     contact.tangentB = Affine2.transformWithoutTranslation(invTransform, contact.tangentB)
   })

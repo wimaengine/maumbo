@@ -40,12 +40,12 @@ export class Contact2D {
   }
 
   transform(transformA: Affine2, transformB: Affine2): this {
-    transformA.transform(this.pointA)
-    transformB.transform(this.pointB)
-    this.normalA = Affine2.transformWithoutTranslation(transformA, this.normalA)
-    this.normalB = Affine2.transformWithoutTranslation(transformB, this.normalB)
-    this.tangentA = Affine2.transformWithoutTranslation(transformA, this.tangentA)
-    this.tangentB = Affine2.transformWithoutTranslation(transformB, this.tangentB)
+    Affine2.transform(transformA, this.pointA, this.pointA)
+    Affine2.transform(transformB, this.pointB, this.pointB)
+    Affine2.transformWithoutTranslation(transformA, this.normalA, this.normalA)
+    Affine2.transformWithoutTranslation(transformB, this.normalB, this.normalB)
+    Affine2.transformWithoutTranslation(transformA, this.tangentA, this.tangentA)
+    Affine2.transformWithoutTranslation(transformB, this.tangentB, this.tangentB)
     return this
   }
 

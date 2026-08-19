@@ -13,9 +13,5 @@ export function tripleProduct(a: Vector2, b: Vector2, c: Vector2): Vector2 {
 export function perpendicularToward(edge: Vector2, toward: Vector2): Vector2 {
   const normal = new Vector2(-edge.y, edge.x)
 
-  if (Vector2.dot(normal, toward) < 0) {
-    normal.reverse()
-  }
-
-  return normal
+  return Vector2.dot(normal, toward) < 0 ? normal.reverse() : normal
 }

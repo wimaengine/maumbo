@@ -50,7 +50,7 @@ export function circlePolygonContact(
     axis.set(transform.x, transform.y)
   }
   
-  axis.normalize()
+  Vector2.normalize(axis, axis)
   const axes = [
     axis,
     ...polygon.normals.map((e: Vector2) => Affine2.transformWithoutTranslation(transform, e))

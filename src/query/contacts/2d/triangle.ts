@@ -88,7 +88,7 @@ export function circleTriangleContacts(
     axis.set(transform.x, transform.y)
   }
   
-  axis.normalize()
+  Vector2.normalize(axis, axis)
   const axes = [
     axis,
     Vector2.normal(Vector2.subtract(points[0], points[1])).normalize(),

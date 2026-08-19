@@ -100,7 +100,7 @@ function findClosestEdge(polytope: SupportPoint<Vector2>[]): { distance: number,
       continue
     }
 
-    normal.normalize()
+    normal = normal.normalize()
 
     if (Vector2.dot(normal, a) < 0) {
       normal = normal.reverse()

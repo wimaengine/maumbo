@@ -124,8 +124,7 @@ function drawShape(gizmo, shape) {
  * @param {Affine2} transform
  */
 function drawBoundingCircle(gizmo, shape, transform) {
-  const bounds = shape.boundingCircle()
-  bounds.transform(transform)
+  const bounds = shape.boundingCircle().transform(transform)
 
   gizmo
     .setTransform(new Affine2().translate(bounds.position))

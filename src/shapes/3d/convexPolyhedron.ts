@@ -34,8 +34,8 @@ function calcFaceNormals3D(vertices: Vector3[], tolerance?: number): Vector3[] {
   const epsilon = tolerance ?? 1e-8
   const center = new Vector3()
 
-  for (let i = 0; i < length; i++) center.add(vertices[i])
-  center.divideScalar(length)
+  for (let i = 0; i < length; i++) Vector3.add(center, vertices[i], center)
+  Vector3.divideScalar(center, length, center)
 
   for (let i = 0; i < length - 2; i++) {
     const a = vertices[i]
@@ -67,7 +67,7 @@ function calcFaceNormals3D(vertices: Vector3[], tolerance?: number): Vector3[] {
 
         Vector3.normalize(axis, axis)
 
-        if (Vector3.dot(axis, Vector3.subtract(center, a)) > 0) axis.reverse()
+        if (Vector3.dot(axis, Vector3.subtract(center, a)) > 0) Vector3.reverse(axis, axis)
 
         if (!checkifEquals(axis, axes, tolerance)) axes.push(axis)
       }

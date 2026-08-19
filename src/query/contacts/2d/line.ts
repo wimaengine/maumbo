@@ -74,7 +74,7 @@ export function linesContact(
     normalB = new Vector2(da.y, -da.x)
   }
 
-  normalB.normalize()
+  normalB = normalB.normalize()
 
   const normalA = Affine2
     .transformWithoutTranslation(transform, normalB)

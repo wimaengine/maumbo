@@ -16,10 +16,10 @@ export function getContacts(
   results: SATStructure,
   position: Vector2
 ): Contact2D[] | undefined {
-  const { axis } = results
+  let axis = results.axis.clone()
 
   if (axis.dot(position) < 0) {
-    axis.reverse()
+    axis = axis.reverse()
   }
 
   const featureA = getPolygonFeature(verticesA, axis)
@@ -35,10 +35,10 @@ export function getFeatureContacts(
   results: SATStructure,
   position: Vector2
 ): Contact2D[] | undefined {
-  const axis = results.axis.clone()
+  let axis = results.axis.clone()
 
   if (axis.dot(position) < 0) {
-    axis.reverse()
+    axis = axis.reverse()
   }
 
   const contacts = buildContactsFromFeatures(featureA, featureB, axis, results.overlap, 0)

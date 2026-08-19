@@ -70,7 +70,7 @@ export class Gizmo2D {
    * @returns {this}
    */
   transform(matrix) {
-    this.transformation.multiply(matrix)
+    Affine2.multiply(this.transformation, matrix, this.transformation)
 
     return this
   }
@@ -81,7 +81,7 @@ export class Gizmo2D {
    * @returns {this}
    */
   translate(x, y) {
-    this.transformation.translate(new Vector2(x, y))
+    Affine2.translate(this.transformation, new Vector2(x, y), this.transformation)
 
     return this
   }
@@ -91,7 +91,7 @@ export class Gizmo2D {
    * @returns {this}
    */
   rotate(angle) {
-    this.transformation.rotate(Rotary.fromAngle(angle))
+    Affine2.rotate(this.transformation, Rotary.fromAngle(angle), this.transformation)
 
     return this
   }
@@ -102,7 +102,7 @@ export class Gizmo2D {
    * @returns {this}
    */
   scale(x, y) {
-    this.transformation.scale(new Vector2(x, y))
+    Affine2.scale(this.transformation, new Vector2(x, y), this.transformation)
 
     return this
   }
