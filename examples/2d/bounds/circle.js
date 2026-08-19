@@ -137,7 +137,7 @@ function drawBoundingCircle(gizmo, shape, transform) {
  * @param {Circle | Ellipse | Capsule | Rectangle | Triangle | ConvexPolygon | Line2} shape
  */
 function getShapeCenter(shape) {
-  const bounds = shape.aabb2d()
+  const bounds = shape.localaabb2d()
 
   return new Vector2(
     (bounds.min.x + bounds.max.x) * 0.5,

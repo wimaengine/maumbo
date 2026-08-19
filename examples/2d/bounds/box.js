@@ -123,8 +123,7 @@ function drawShape(gizmo, shape) {
  * @param {Affine2} transform
  */
 function drawBoundingBox(gizmo, shape, transform) {
-  const bounds = shape.aabb2d()
-  bounds.transform(transform)
+  const bounds = shape.aabb2d(transform)
 
   gizmo.lineStrip(
     [
@@ -141,7 +140,7 @@ function drawBoundingBox(gizmo, shape, transform) {
  * @param {Circle | Ellipse | Capsule | Rectangle | Triangle | ConvexPolygon | Line2} shape
  */
 function getShapeCenter(shape) {
-  const bounds = shape.aabb2d()
+  const bounds = shape.localaabb2d()
 
   return new Vector2(
     (bounds.min.x + bounds.max.x) * 0.5,
