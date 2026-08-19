@@ -3,7 +3,7 @@ import { withBase } from "./url";
 
 const maumboVersion = packageJson["version"].replace(/^[^\d]*/, "");
 const hisabatiVersion = packageJson.dependencies["hisabati"].replace(/^[^\d]*/, "");
-const marangiVersion = packageJson.dependencies["marangi"].replace(/^[^\d]*/, "");
+const marangiVersion = packageJson.devDependencies["marangi"].replace(/^[^\d]*/, "");
 
 export interface ExampleImportMap {
   imports: Record<string, string>;
