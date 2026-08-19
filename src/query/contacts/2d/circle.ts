@@ -27,17 +27,12 @@ export function circleContact(
   const penetration = radiiSum - distance
   const normalA = distance !== 0 ? new Vector2(dx / distance, dy / distance) : Vector2.Y.clone()
   const normalB = Affine2.transformWithoutTranslation(invTransform, normalA).reverse()
-  const tangentA = Vector2.normal(normalA)
-  const tangentB = Vector2.normal(normalB)
   
   return new Contact2D(
     Vector2.multiplyScalar(normalA, a.radius),
     Vector2.multiplyScalar(normalB, b.radius),
     normalA,
     normalB,
-    penetration,
-    tangentA,
-    tangentB
+    penetration
   )
 }
-

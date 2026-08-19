@@ -38,13 +38,11 @@ export function sat2dCircle(
   )
 
   if (contacts) {
-    contacts.map((contact) => {
+    contacts.forEach((contact) => {
       Affine2.transform(invTransform, contact.pointB, contact.pointB)
       contact.normalB = Affine2.transformWithoutTranslation(invTransform, contact.normalB)
-      contact.tangentB = contact.tangentB
-        ? Affine2.transformWithoutTranslation(invTransform, contact.tangentB)
-        : Vector2.normal(contact.normalB)
-      return contact
+      Vector2.normal(contact.normalA, contact.tangentA)
+      Vector2.normal(contact.normalB, contact.tangentB)
     })
   }
 

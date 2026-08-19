@@ -79,8 +79,6 @@ export function linesContact(
   const normalA = Affine2
     .transformWithoutTranslation(transform, normalB)
     .reverse()
-  const tangentA = Vector2.normal(normalA)
-  const tangentB = Vector2.normal(normalB)
 
   const contactB = closestB
   const contactA = Vector2.add(
@@ -93,9 +91,7 @@ export function linesContact(
     contactB,
     normalA,
     normalB,
-    0,
-    tangentA,
-    tangentB
+    0
   )
 }
 

@@ -172,8 +172,6 @@ function buildPointEdgeContacts(
 export function buildPointPointContact(pointA: Vector2, pointB: Vector2, normal: Vector2, depth: number): Contact2D[] {
   const normalA = normal.magnitudeSquared() === 0 ? Vector2.X.clone() : normal.clone().normalize()
   const normalB = normalA.clone().reverse()
-  const tangentA = Vector2.normal(normalA)
-  const tangentB = Vector2.normal(normalB)
 
   return [
     new Contact2D(
@@ -181,9 +179,7 @@ export function buildPointPointContact(pointA: Vector2, pointB: Vector2, normal:
       pointB.clone(),
       normalA,
       normalB,
-      Math.max(depth, 0),
-      tangentA,
-      tangentB
+      Math.max(depth, 0)
     )
   ]
 }
@@ -195,28 +191,27 @@ function createContact(
   incidentPoint: Vector2,
   depth: number
 ): Contact2D {
-  const tangent = Vector2.normal(referenceNormal)
+  const normalA = referenceShape === 'A'
+    ? referenceNormal.clone()
+    : referenceNormal.clone().reverse()
+  const normalB = normalA.clone().reverse()
 
   if (referenceShape === 'A') {
     return new Contact2D(
       referencePoint.clone(),
       incidentPoint.clone(),
-      referenceNormal.clone(),
-      referenceNormal.clone().reverse(),
-      depth,
-      tangent.clone(),
-      tangent.clone()
+      normalA,
+      normalB,
+      depth
     )
   }
 
   return new Contact2D(
     incidentPoint.clone(),
     referencePoint.clone(),
-    referenceNormal.clone().reverse(),
-    referenceNormal.clone(),
-    depth,
-    tangent.clone(),
-    tangent.clone()
+    normalA,
+    normalB,
+    depth
   )
 }
 

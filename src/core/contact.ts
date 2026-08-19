@@ -1,10 +1,10 @@
 import { Affine2, Vector2 } from 'hisabati'
 
 export class Contact2D {
-  pointA = new Vector2()
-  pointB = new Vector2()
-  normalA = new Vector2()
-  normalB = new Vector2()
+  pointA
+  pointB
+  normalA
+  normalB
   depth = 0
   tangentA = new Vector2()
   tangentB = new Vector2()
@@ -14,17 +14,14 @@ export class Contact2D {
     pointB: Vector2,
     normalA: Vector2,
     normalB: Vector2,
-    depth: number,
-    tangentA: Vector2,
-    tangentB: Vector2
+    depth: number
   ) {
     this.pointA = pointA
     this.pointB = pointB
     this.normalA = normalA
     this.normalB = normalB
     this.depth = depth
-    this.tangentA = tangentA
-    this.tangentB = tangentB
+    this.updateTangents()
   }
 
   clone(): Contact2D {
@@ -33,9 +30,7 @@ export class Contact2D {
       this.pointB.clone(),
       this.normalA.clone(),
       this.normalB.clone(),
-      this.depth,
-      this.tangentA.clone(),
-      this.tangentB.clone()
+      this.depth
     )
   }
 
@@ -44,21 +39,24 @@ export class Contact2D {
     Affine2.transform(transformB, this.pointB, this.pointB)
     Affine2.transformWithoutTranslation(transformA, this.normalA, this.normalA)
     Affine2.transformWithoutTranslation(transformB, this.normalB, this.normalB)
-    Affine2.transformWithoutTranslation(transformA, this.tangentA, this.tangentA)
-    Affine2.transformWithoutTranslation(transformB, this.tangentB, this.tangentB)
+    this.updateTangents()
     return this
   }
 
   flip(): this {
-    const { pointA, normalA, tangentA } = this
+    const { pointA, normalA } = this
 
     this.pointA = this.pointB
     this.pointB = pointA
     this.normalA = this.normalB
     this.normalB = normalA
-    this.tangentA = this.tangentB
-    this.tangentB = tangentA
+    this.updateTangents()
 
     return this
+  }
+
+  private updateTangents(): void {
+    Vector2.normal(this.normalA, this.tangentA)
+    Vector2.normal(this.normalB, this.tangentB)
   }
 }
