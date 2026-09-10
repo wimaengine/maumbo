@@ -2,7 +2,62 @@ import { Affine2, Vector2 } from 'hisabati'
 import type { Contact2D } from '../../../core/contact'
 import type { SupportMapped2d } from '../../../core/clipping'
 import { buildContactsFromFeatures, getPolygonFeature, type Feature } from '../../../core/clipping'
+import { buildPointPointContact, transformFeature2d } from '../../../core/clipping'
+import { EPA2d } from '../../../core/EPA'
+import { GJK2d } from '../../../core/GJK'
 import { SATStructure, sat2d, sat2dSupportMap } from '../../../core'
+
+const CONTACT_TOLERANCE = 1e-6
+
+export function gjkEPAContact2d(
+  shapeA: SupportMapped2d,
+  shapeB: SupportMapped2d,
+  transform: Affine2,
+  invTransform: Affine2
+): Contact2D[] | undefined {
+  const position = new Vector2(transform.x, transform.y)
+  const simplex = GJK2d(shapeA, shapeB, transform, invTransform, position)
+  if (!simplex) return undefined
+
+  const epa = EPA2d(simplex, shapeA, shapeB, transform, invTransform, position)
+  if (!epa) return undefined
+
+  let contacts = buildContactsFromFeatures(
+    shapeA.getFeature2d(epa.normal),
+    transformFeature2d(
+      shapeB.getFeature2d(
+        Affine2.transformWithoutTranslation(invTransform, epa.normal.clone().reverse())
+      ),
+      transform
+    ),
+    epa.normal,
+    epa.depth,
+    CONTACT_TOLERANCE
+  )
+
+  if (!contacts.length) {
+    contacts = buildPointPointContact(
+      shapeA.getSupportPoint2d(epa.normal),
+      Affine2.transform(
+        transform,
+        shapeB.getSupportPoint2d(
+          Affine2.transformWithoutTranslation(invTransform, epa.normal.clone().reverse())
+        )
+      ),
+      epa.normal,
+      epa.depth
+    )
+  }
+
+  contacts.forEach((contact) => {
+    Affine2.transform(invTransform, contact.pointB, contact.pointB)
+    contact.normalB = Affine2.transformWithoutTranslation(invTransform, contact.normalB)
+    Vector2.normal(contact.normalA, contact.tangentA)
+    Vector2.normal(contact.normalB, contact.tangentB)
+  })
+
+  return contacts
+}
 
 export function satContact2d(
   verticesA: Vector2[],

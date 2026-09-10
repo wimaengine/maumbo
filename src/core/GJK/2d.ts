@@ -4,6 +4,7 @@ import type { SupportPoint } from "./structs"
 import { perpendicularToward, tripleProduct } from "../utils"
 
 const GJK_MAX_ITERATIONS = 24
+const GJK_DUPLICATE_TOLERANCE_SQUARED = 1e-14
 
 export function GJK2d(
   shapeA: SupportMapped2d,
@@ -28,6 +29,12 @@ export function GJK2d(
       return undefined
     }
 
+    if (simplex.some((previous) =>
+      Vector2.distanceToSquared(previous.point, point.point) <= GJK_DUPLICATE_TOLERANCE_SQUARED
+    )) {
+      return undefined
+    }
+
     simplex.unshift(point)
 
     if (handleSimplex(simplex, direction)) {
@@ -35,7 +42,7 @@ export function GJK2d(
     }
   }
 
-  return simplex.length >= 3 ? simplex : undefined
+  return undefined
 }
 
 function handleSimplex(simplex: SupportPoint<Vector2>[], direction: Vector2): boolean {

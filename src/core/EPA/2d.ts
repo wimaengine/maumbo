@@ -6,6 +6,13 @@ import type { EPAResult } from "./structs"
 const EPA_MAX_ITERATIONS = 32
 const EPA_TOLERANCE = 1e-6
 
+/**
+ * Expands a GJK simplex into the minimum-translation penetration result.
+ *
+ * The simplex must contain a valid, non-degenerate triangle enclosing the
+ * origin. Winding order is not significant because closest-edge selection
+ * orients each edge normal away from the origin.
+ */
 export function EPA2d(
   simplex: SupportPoint<Vector2>[],
   shapeA: SupportMapped2d,
@@ -14,7 +21,11 @@ export function EPA2d(
   invTransform: Affine2,
   position: Vector2
 ): EPAResult<Vector2> | undefined {
-  const polytope = ensureCounterClockwise(simplex.map(copySupportPoint))
+  const polytope = simplex.map(copySupportPoint)
+
+  if (polytope.length < 3) {
+    return undefined
+  }
 
   for (let i = 0; i < EPA_MAX_ITERATIONS; i++) {
     const edge = findClosestEdge(polytope)
@@ -39,20 +50,7 @@ export function EPA2d(
     polytope.splice(edge.index, 0, point)
   }
 
-  const edge = findClosestEdge(polytope)
-
-  if (!edge) {
-    return undefined
-  }
-
-  const normal = Vector2.dot(edge.normal, position) < 0
-    ? edge.normal.clone().reverse()
-    : edge.normal
-
-  return {
-    normal,
-    depth: Math.max(edge.distance, 0)
-  }
+  return undefined
 }
 
 function copySupportPoint(point: SupportPoint<Vector2>): SupportPoint<Vector2> {
@@ -61,27 +59,6 @@ function copySupportPoint(point: SupportPoint<Vector2>): SupportPoint<Vector2> {
     pointA: point.pointA.clone(),
     pointB: point.pointB.clone()
   }
-}
-
-function ensureCounterClockwise(simplex: SupportPoint<Vector2>[]): SupportPoint<Vector2>[] {
-  if (simplex.length < 3) {
-    return simplex
-  }
-
-  const a = simplex[0].point
-  const b = simplex[1].point
-  const c = simplex[2].point
-  const area = Vector2.cross(Vector2.subtract(b, a), Vector2.subtract(c, a))
-
-  if (area < 0) {
-    const copy = simplex.slice()
-    const temp = copy[1]
-    copy[1] = copy[2]
-    copy[2] = temp
-    return copy
-  }
-
-  return simplex
 }
 
 function findClosestEdge(polytope: SupportPoint<Vector2>[]): { distance: number, index: number, normal: Vector2 } | undefined {

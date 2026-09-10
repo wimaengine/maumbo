@@ -1,7 +1,5 @@
-import {
-  Contact2D,
-  GJKandEPA2d
-} from '../../../core'
+import { Contact2D } from '../../../core'
+import { gjkEPAContact2d } from './utils.js'
 import { Capsule, Circle, ConvexPolygon, Rectangle, Triangle } from '../../../shapes'
 import { Vector2, clamp, Affine2 } from 'hisabati'
 import {
@@ -126,7 +124,7 @@ export function capsuleRectangleContact(
   transform: Affine2,
   invTransform: Affine2
 ): Contact2D[] | undefined {
-  return GJKandEPA2d(a, b, transform, invTransform)
+  return gjkEPAContact2d(a, b, transform, invTransform)
 }
 
 /**
@@ -141,7 +139,7 @@ export function capsuleTriangleContact(
   transform: Affine2,
   invTransform: Affine2
 ): Contact2D[] | undefined {
-  return GJKandEPA2d(a, b, transform, invTransform)
+  return gjkEPAContact2d(a, b, transform, invTransform)
 }
 
 /**
@@ -156,5 +154,5 @@ export function capsuleConvexPolygonContact(
   transform: Affine2,
   invTransform: Affine2
 ): Contact2D[] | undefined {
-  return GJKandEPA2d(a, b, transform, invTransform)
+  return gjkEPAContact2d(a, b, transform, invTransform)
 }
