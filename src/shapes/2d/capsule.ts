@@ -1,5 +1,5 @@
 import { Affine2, TAU, Vector2 } from 'hisabati'
-import type { Feature, SupportMapped2d } from '../../core'
+import { projectSupportMapToAxis, type Feature, type SupportMapped2d } from '../../core'
 import { ArcBound2D, BoundingBox2D, type Boundable2D, type BoundaryPrimitive2D, BoundingCircle, Segment2D } from '../../bounds'
 import type { PointQuery2D } from '../../core/query.js'
 
@@ -82,6 +82,10 @@ export class Capsule implements SupportMapped2d, Boundable2D, PointQuery2D {
       : new Vector2(0, -this.halfHeight)
 
     return Vector2.multiplyScalar(axis, this.radius).add(center)
+  }
+
+  project(axis: Vector2): [number, number] {
+    return projectSupportMapToAxis(this, axis)
   }
 
   getFeature2d(direction: Vector2): Feature {

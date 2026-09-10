@@ -17,6 +17,24 @@ export type Feature =
 export interface SupportMapped2d {
   getSupportPoint2d(direction: Vector2): Vector2
   getFeature2d(direction: Vector2): Feature
+  /** Projects the shape onto a normalized axis and returns [min, max]. */
+  project(axis: Vector2): [number, number]
+}
+
+/**
+ * Default projection for support-mapped 2D shapes.
+ * The axis must be normalized.
+ */
+export function projectSupportMapToAxis(
+  shape: SupportMapped2d,
+  axis: Vector2
+): [number, number] {
+  const maxPoint = shape.getSupportPoint2d(axis)
+  const minPoint = shape.getSupportPoint2d(axis.clone().reverse())
+  const max = Vector2.dot(axis, maxPoint)
+  const min = Vector2.dot(axis, minPoint)
+
+  return min <= max ? [min, max] : [max, min]
 }
 
 export function transformFeature2d(feature: Feature, transform: Affine2): Feature {

@@ -1,5 +1,5 @@
 import { Affine2, Vector2 } from 'hisabati'
-import { getPolygonFeature, type Feature, type SupportMapped2d } from '../../core'
+import { getPolygonFeature, projectSupportMapToAxis, type Feature, type SupportMapped2d } from '../../core'
 import { BoundingBox2D, BoundingCircle, Segment2D, type BoundaryPrimitive2D, type Boundable2D } from '../../bounds/index.js'
 import type { PointQuery2D } from '../../core/query.js'
 
@@ -59,6 +59,10 @@ export class Rectangle implements SupportMapped2d, Boundable2D, PointQuery2D {
     }
 
     return support.clone()
+  }
+
+  project(axis: Vector2): [number, number] {
+    return projectSupportMapToAxis(this, axis)
   }
 
   getFeature2d(direction: Vector2): Feature {

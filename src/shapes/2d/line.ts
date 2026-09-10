@@ -1,6 +1,6 @@
 import { Affine2, Vector2 } from 'hisabati'
 import { BoundingBox2D, BoundingCircle, Segment2D, type BoundaryPrimitive2D, type Boundable2D } from '../../bounds/index.js'
-import type { Feature, SupportMapped2d } from '../../core/clipping.js'
+import { projectSupportMapToAxis, type Feature, type SupportMapped2d } from '../../core/clipping.js'
 import type { PointQuery2D } from '../../core/query.js'
 
 export class Line2 implements Boundable2D, SupportMapped2d, PointQuery2D {
@@ -21,6 +21,10 @@ export class Line2 implements Boundable2D, SupportMapped2d, PointQuery2D {
     return (direction.x >= 0)
       ? new Vector2(this.halfLength, 0)
       : new Vector2(-this.halfLength, 0)
+  }
+
+  project(axis: Vector2): [number, number] {
+    return projectSupportMapToAxis(this, axis)
   }
 
   getFeature2d(direction: Vector2): Feature {
