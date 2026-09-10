@@ -1,5 +1,6 @@
 import { Affine2, Vector2 } from 'hisabati'
-import { Contact2D, GJKandEPA2d, SAT2d } from '../../../core'
+import { Contact2D, GJKandEPA2d } from '../../../core'
+import { satContact2d } from './utils.js'
 import { Capsule, Circle, ConvexPolygon, Line2, Rectangle, Triangle } from '../../../shapes'
 
 /**
@@ -133,7 +134,7 @@ export function lineRectangleContact(
     Vector2.normal(Vector2.subtract(pointsB[1], pointsB[2])).normalize()
   ]
 
-  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
+  return satContact2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
@@ -160,7 +161,7 @@ export function lineTriangleContact(
     Vector2.normal(Vector2.subtract(pointsB[2], pointsB[0])).normalize()
   ]
 
-  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
+  return satContact2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
@@ -200,5 +201,5 @@ export function lineConvexPolygonContact(
     ...b.normals.map((normal) => Affine2.transformWithoutTranslation(transform, normal))
   ]
 
-  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
+  return satContact2d(pointsA, pointsB, axes, transform, invTransform)
 }

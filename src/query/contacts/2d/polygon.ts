@@ -1,4 +1,5 @@
-import { SAT2d, sat2dCircle } from '../../../core'
+import { satContact2d } from './utils.js'
+import { satSupportMapContact2d } from './utils.js'
 import { Circle, Rectangle, ConvexPolygon, Triangle } from '../../../shapes'
 import { Vector2, Affine2 } from 'hisabati'
 import { getNearVertex } from './utils.js'
@@ -14,7 +15,7 @@ export function polygonContacts(
   boxB: ConvexPolygon,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof SAT2d> {
+): ReturnType<typeof satContact2d> {
   const pointsA = boxA.points.map((e: Vector2) => e.clone())
   const pointsB = boxB.points.map((e: Vector2) => transform.transform(e.clone()))
   
@@ -23,7 +24,7 @@ export function polygonContacts(
     ...boxB.normals.map((e: Vector2) => Affine2.transformWithoutTranslation(transform, e))
   ]
 
-  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
+  return satContact2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
@@ -37,7 +38,7 @@ export function circlePolygonContact(
   polygon: ConvexPolygon,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof sat2dCircle> {
+): ReturnType<typeof satSupportMapContact2d> {
   const points = polygon.points.map((e: Vector2) => transform.transform(e.clone()))
   
   const nearestIndex = getNearVertex(Vector2.Zero, points)
@@ -56,7 +57,7 @@ export function circlePolygonContact(
     ...polygon.normals.map((e: Vector2) => Affine2.transformWithoutTranslation(transform, e))
   ]
 
-  return sat2dCircle(circle, points, axes, transform, invTransform)
+  return satSupportMapContact2d(circle, points, axes, transform, invTransform)
 }
 
 /**
@@ -70,7 +71,7 @@ export function polygonRectangleContacts(
   boxB: Rectangle,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof SAT2d> {
+): ReturnType<typeof satContact2d> {
   const pointsA = boxA.points.map((e: Vector2) => e.clone())
   const pointsB = boxB.getPoints().map((e: Vector2) => transform.transform(e))
   
@@ -84,7 +85,7 @@ export function polygonRectangleContacts(
     Vector2.normal(Vector2.subtract(pointsB[1], pointsB[2])).normalize()
   ]
 
-  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
+  return satContact2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
@@ -98,7 +99,7 @@ export function polygonTriangleContacts(
   boxB: Triangle,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof SAT2d> {
+): ReturnType<typeof satContact2d> {
   const pointsA = boxA.points.map((e: Vector2) => e.clone())
   const pointsB = boxB.getPoints().map((e: Vector2) => transform.transform(e))
 
@@ -113,5 +114,5 @@ export function polygonTriangleContacts(
     Vector2.normal(Vector2.subtract(pointsB[2], pointsB[0])).normalize()
   ]
 
-  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
+  return satContact2d(pointsA, pointsB, axes, transform, invTransform)
 }

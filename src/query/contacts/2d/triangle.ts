@@ -1,5 +1,5 @@
 import { Vector2, Affine2 } from 'hisabati'
-import { SAT2d, sat2dCircle } from '../../../core'
+import { satContact2d, satSupportMapContact2d } from './utils.js'
 import { Circle, Rectangle, Triangle } from '../../../shapes'
 import { getNearVertex } from './utils.js'
 
@@ -14,7 +14,7 @@ export function triangleContacts(
   boxB: Triangle,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof SAT2d> {
+): ReturnType<typeof satContact2d> {
   const pointsA = boxA.getPoints()
   const pointsB = boxB.getPoints().map((e: Vector2) => transform.transform(e))
   
@@ -31,7 +31,7 @@ export function triangleContacts(
     Vector2.subtract(pointsB[2], pointsB[0]).normalize()
   ].map((axis) => Vector2.normal(axis, axis))
 
-  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
+  return satContact2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
@@ -45,7 +45,7 @@ export function triangleRectangleContacts(
   boxB: Rectangle,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof SAT2d> {
+): ReturnType<typeof satContact2d> {
   const pointsA = boxA.getPoints()
   const pointsB = boxB.getPoints().map((e: Vector2) => transform.transform(e))
   
@@ -61,7 +61,7 @@ export function triangleRectangleContacts(
     Vector2.subtract(pointsB[1], pointsB[2]).normalize()
   ].map((axis) => Vector2.normal(axis, axis))
 
-  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
+  return satContact2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
@@ -75,7 +75,7 @@ export function circleTriangleContacts(
   triangle: Triangle,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof sat2dCircle> {
+): ReturnType<typeof satSupportMapContact2d> {
   const points = triangle.getPoints().map((e: Vector2) => transform.transform(e.clone()))
   
   const nearestIndex = getNearVertex(Vector2.Zero, points)
@@ -96,5 +96,5 @@ export function circleTriangleContacts(
     Vector2.normal(Vector2.subtract(points[2], points[0])).normalize()
   ]
 
-  return sat2dCircle(circle, points, axes, transform, invTransform)
+  return satSupportMapContact2d(circle, points, axes, transform, invTransform)
 }

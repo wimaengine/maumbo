@@ -1,7 +1,7 @@
 import test, { describe } from "node:test"
 import { deepStrictEqual, ok, strictEqual } from "node:assert"
 import { Vector2, Affine2, fuzzyEqual } from "hisabati"
-import { SAT2d, Contact2D, projectShapesToAxes } from "../dist/index.module.js"
+import { satContact2d, Contact2D, sat2d } from "../dist/index.module.js"
 
 describe("Testing SAT contact point generation", (suite)=>{
   test("Contact on one point", () => {
@@ -26,7 +26,7 @@ describe("Testing SAT contact point generation", (suite)=>{
       Vector2.subtract(pointsB[1], pointsB[2])
     ].map(axis => Vector2.normal(axis).normalize())
   
-    const contacts = SAT2d(pointsA, pointsB, axes, transform, transform.invert())
+    const contacts = satContact2d(pointsA, pointsB, axes, transform, transform.invert())
     deepStrictEqual(contacts, [
       new Contact2D(
         new Vector2(6, 4),
@@ -58,7 +58,7 @@ describe("Testing SAT contact point generation", (suite)=>{
       Vector2.subtract(pointsB[1], pointsB[2])
     ].map(axis => Vector2.normal(axis).normalize())
   
-    const contacts = SAT2d(pointsA, pointsB, axes, transform, transform.invert())
+    const contacts = satContact2d(pointsA, pointsB, axes, transform, transform.invert())
     deepStrictEqual(contacts, [
       new Contact2D(
         new Vector2(12, 4),
@@ -99,7 +99,7 @@ describe("Testing SAT contact point generation", (suite)=>{
       Vector2.subtract(pointsB[1], pointsB[2])
     ].map(axis => Vector2.normal(axis).normalize())
   
-    const contacts = SAT2d(pointsA, pointsB, axes, transform, transform.invert())
+    const contacts = satContact2d(pointsA, pointsB, axes, transform, transform.invert())
     deepStrictEqual(contacts[0].pointA, new Vector2(11.588235294117647, 3.3529411764705883))
     deepStrictEqual(contacts[0].pointB, new Vector2(12, 5))
     ok(fuzzyEqual(contacts[0].normalA.x, -0.24253562503633297))
@@ -117,7 +117,7 @@ describe("Testing SAT contact point generation", (suite)=>{
     strictEqual(contacts[1].depth, 1.0307764064044151)
   })
 
-  test("projectShapesToAxes: can keep scanning to find the closest separating axis", () => {
+  test("sat2d: can keep scanning to find the closest separating axis", () => {
     const pointsA = [
       new Vector2(-1, -1),
       new Vector2(1, -1),
@@ -135,7 +135,7 @@ describe("Testing SAT contact point generation", (suite)=>{
       new Vector2(0, 1),
     ]
 
-    const result = projectShapesToAxes(pointsA, pointsB, axes, false)
+    const result = sat2d(pointsA, pointsB, axes, false)
 
     deepStrictEqual(result.axis, new Vector2(1, 0))
     strictEqual(result.overlap, -2)

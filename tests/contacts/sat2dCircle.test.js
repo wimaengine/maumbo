@@ -1,9 +1,9 @@
 import test from "node:test"
 import { ok, strictEqual } from "node:assert"
 import { Affine2, Vector2 } from "hisabati"
-import { Circle, sat2dCircle } from "../../dist/index.module.js"
+import { Circle, satSupportMapContact2d } from "../../dist/index.module.js"
 
-test("sat2dCircle: returns undefined when separated", () => {
+test("satSupportMapContact2d: returns undefined when separated", () => {
   const circle = new Circle(1)
   const rectPoints = [
     new Vector2(-1, -1),
@@ -21,10 +21,10 @@ test("sat2dCircle: returns undefined when separated", () => {
   transform.x = 5
   const invTransform = Affine2.copy(transform).invert()
 
-  strictEqual(sat2dCircle(circle, rectPoints, axes, transform, invTransform), undefined)
+  strictEqual(satSupportMapContact2d(circle, rectPoints, axes, transform, invTransform), undefined)
 })
 
-test("sat2dCircle: returns contacts when overlapping", () => {
+test("satSupportMapContact2d: returns contacts when overlapping", () => {
   const circle = new Circle(1)
   const rectPoints = [
     new Vector2(-1, -1),
@@ -43,7 +43,7 @@ test("sat2dCircle: returns contacts when overlapping", () => {
   transform.x = 1.5
   const invTransform = Affine2.copy(transform).invert()
 
-  const contacts = sat2dCircle(circle, rectPoints, axes, transform, invTransform)
+  const contacts = satSupportMapContact2d(circle, rectPoints, axes, transform, invTransform)
   ok(Array.isArray(contacts))
   ok(contacts.length > 0)
   contacts.forEach((contact) => ok(contact.depth >= -1e-9))

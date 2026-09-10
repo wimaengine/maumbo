@@ -1,4 +1,3 @@
-export * from './satVertices'
-export * from './satVerticesSupportMap'
+export * from './2d'
 export * from './structs'
 export * from './utils'

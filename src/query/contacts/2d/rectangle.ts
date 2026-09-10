@@ -1,4 +1,4 @@
-import { SAT2d, sat2dCircle } from '../../../core'
+import { satContact2d, satSupportMapContact2d } from './utils.js'
 import { Circle, Rectangle } from '../../../shapes'
 import { Vector2, Affine2 } from 'hisabati'
 import { getNearVertex } from './utils.js'
@@ -14,7 +14,7 @@ export function rectangleContacts(
   boxB: Rectangle,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof SAT2d> {
+): ReturnType<typeof satContact2d> {
   const pointsA = boxA.getPoints()
   const pointsB = boxB.getPoints().map((e: Vector2) => transform.transform(e))
   
@@ -29,7 +29,7 @@ export function rectangleContacts(
     Vector2.subtract(pointsB[1], pointsB[2]).normalize()
   ].map((axis) => Vector2.normal(axis, axis))
 
-  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
+  return satContact2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
@@ -43,7 +43,7 @@ export function circleRectangleContacts(
   rectangle: Rectangle,
   transform: Affine2,
   invTransform: Affine2
-): ReturnType<typeof sat2dCircle> {
+): ReturnType<typeof satSupportMapContact2d> {
   const points = rectangle.getPoints().map((e: Vector2) => transform.transform(e.clone()))
   
   const nearestIndex = getNearVertex(Vector2.Zero, points)
@@ -63,5 +63,5 @@ export function circleRectangleContacts(
     Vector2.normal(Vector2.subtract(points[1], points[2])).normalize()
   ]
 
-  return sat2dCircle(circle, points, axes, transform, invTransform)
+  return satSupportMapContact2d(circle, points, axes, transform, invTransform)
 }
