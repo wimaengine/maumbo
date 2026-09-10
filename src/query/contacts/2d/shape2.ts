@@ -8,7 +8,6 @@ import {
   linesContact,
   lineRectangleContact,
   lineTriangleContact,
-  lineCapsuleContact,
   lineConvexPolygonContact,
   lineCircleContact
 } from './line.js'
@@ -32,7 +31,8 @@ import {
   capsuleCircleContact,
   capsuleRectangleContact,
   capsuleTriangleContact,
-  capsuleConvexPolygonContact
+  capsuleConvexPolygonContact,
+  capsuleLineContact
 } from './capsule.js'
 import {
   ellipseEllipseContacts, ellipseCircleContacts, ellipseCapsuleContacts, ellipseLineContacts,
@@ -101,15 +101,15 @@ export function getShape2Contacts(
 
     return contacts
   } else if (shapeA instanceof Line2 && shapeB instanceof Capsule) {
-    return lineCapsuleContact(shapeA, shapeB, transform, transformInv)
-  } else if (shapeA instanceof Capsule && shapeB instanceof Line2) {
-    const contacts = lineCapsuleContact(shapeB, shapeA, transformInv, transform)
+    const contacts = capsuleLineContact(shapeB, shapeA, transformInv, transform)
 
     if (contacts) {
       contacts.forEach((c) => c.flip())
     }
 
     return contacts
+  } else if (shapeA instanceof Capsule && shapeB instanceof Line2) {
+    return capsuleLineContact(shapeA, shapeB, transform, transformInv)
   } else if (shapeA instanceof Line2 && shapeB instanceof ConvexPolygon) {
     return lineConvexPolygonContact(shapeA, shapeB, transform, transformInv)
   } else if (shapeA instanceof ConvexPolygon && shapeB instanceof Line2) {

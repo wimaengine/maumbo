@@ -1,10 +1,40 @@
 import { Contact2D } from '../../../core'
 import { gjkEPAContact2d } from './utils.js'
-import { Capsule, Circle, ConvexPolygon, Rectangle, Triangle } from '../../../shapes'
+import { satSupportMapContact2d } from './utils.js'
+import { Capsule, Circle, ConvexPolygon, Line2, Rectangle, Triangle } from '../../../shapes'
 import { Vector2, clamp, Affine2 } from 'hisabati'
 import {
   closestPointsSegmentSegment
 } from '../../closestPoint'
+
+/**
+ * @param {Capsule} capsule
+ * @param {Line2} line
+ * @param {Affine2} transform
+ * @param {Affine2} invTransform
+ */
+export function capsuleLineContact(
+  capsule: Capsule,
+  line: Line2,
+  transform: Affine2,
+  invTransform: Affine2
+): Contact2D[] | undefined {
+  const linePoints = [
+    Affine2.transform(transform, new Vector2(-line.halfLength, 0)),
+    Affine2.transform(transform, new Vector2(line.halfLength, 0))
+  ]
+  const lineEdge = Vector2.subtract(linePoints[1], linePoints[0])
+  const axes: Vector2[] = [
+    new Vector2(lineEdge.y, -lineEdge.x).normalize(),
+    Vector2.X.clone().normalize(),
+    Vector2.subtract(linePoints[0], new Vector2(0, capsule.halfHeight)).normalize(),
+    Vector2.subtract(linePoints[1], new Vector2(0, capsule.halfHeight)).normalize(),
+    Vector2.subtract(linePoints[0], new Vector2(0, -capsule.halfHeight)).normalize(),
+    Vector2.subtract(linePoints[1], new Vector2(0, -capsule.halfHeight)).normalize()
+  ]
+
+  return satSupportMapContact2d(capsule, linePoints, axes, transform, invTransform)
+}
 
 /**
  * @param {Capsule} capsuleA
