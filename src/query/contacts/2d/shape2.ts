@@ -1,4 +1,4 @@
-import { Circle, Capsule, Line2, Rectangle, ConvexPolygon, Triangle, type Shape2 } from '../../../shapes'
+import { Circle, Capsule, Ellipse, Line2, Rectangle, ConvexPolygon, Triangle, type Shape2 } from '../../../shapes'
 import { Affine2 } from 'hisabati'
 import { Contact2D } from '../../../core'
 import {
@@ -34,6 +34,10 @@ import {
   capsuleTriangleContact,
   capsuleConvexPolygonContact
 } from './capsule.js'
+import {
+  ellipseEllipseContacts, ellipseCircleContacts, ellipseCapsuleContacts, ellipseLineContacts,
+  ellipseRectangleContacts, ellipsePolygonContacts, ellipseTriangleContacts
+} from './ellipse.js'
 
 /**
  * @param {Shape2} shapeA
@@ -64,6 +68,8 @@ export function getShape2Contacts(
     return polygonContacts(shapeA, shapeB, transform, transformInv)
   } else if (shapeA instanceof Triangle && shapeB instanceof Triangle) {
     return triangleContacts(shapeA, shapeB, transform, transformInv)
+  } else if (shapeA instanceof Ellipse && shapeB instanceof Ellipse) {
+    return ellipseEllipseContacts(shapeA, shapeB, transform, transformInv)
   } else if (shapeA instanceof Line2 && shapeB instanceof Circle) {
     return lineCircleContact(shapeA, shapeB, transform, transformInv)
   } else if (shapeA instanceof Line2 && shapeB instanceof Line2) {
@@ -228,6 +234,42 @@ export function getShape2Contacts(
     }
 
     return undefined
+  } else if (shapeA instanceof Ellipse && shapeB instanceof Circle) {
+    return ellipseCircleContacts(shapeA, shapeB, transform, transformInv)
+  } else if (shapeB instanceof Ellipse && shapeA instanceof Circle) {
+    const contacts = ellipseCircleContacts(shapeB, shapeA, transformInv, transform)
+    if (contacts) contacts.forEach((contact) => contact.flip())
+    return contacts
+  } else if (shapeA instanceof Ellipse && shapeB instanceof Capsule) {
+    return ellipseCapsuleContacts(shapeA, shapeB, transform, transformInv)
+  } else if (shapeB instanceof Ellipse && shapeA instanceof Capsule) {
+    const contacts = ellipseCapsuleContacts(shapeB, shapeA, transformInv, transform)
+    if (contacts) contacts.forEach((contact) => contact.flip())
+    return contacts
+  } else if (shapeA instanceof Ellipse && shapeB instanceof Line2) {
+    return ellipseLineContacts(shapeA, shapeB, transform, transformInv)
+  } else if (shapeB instanceof Ellipse && shapeA instanceof Line2) {
+    const contacts = ellipseLineContacts(shapeB, shapeA, transformInv, transform)
+    if (contacts) contacts.forEach((contact) => contact.flip())
+    return contacts
+  } else if (shapeA instanceof Ellipse && shapeB instanceof Rectangle) {
+    return ellipseRectangleContacts(shapeA, shapeB, transform, transformInv)
+  } else if (shapeB instanceof Ellipse && shapeA instanceof Rectangle) {
+    const contacts = ellipseRectangleContacts(shapeB, shapeA, transformInv, transform)
+    if (contacts) contacts.forEach((contact) => contact.flip())
+    return contacts
+  } else if (shapeA instanceof Ellipse && shapeB instanceof ConvexPolygon) {
+    return ellipsePolygonContacts(shapeA, shapeB, transform, transformInv)
+  } else if (shapeB instanceof Ellipse && shapeA instanceof ConvexPolygon) {
+    const contacts = ellipsePolygonContacts(shapeB, shapeA, transformInv, transform)
+    if (contacts) contacts.forEach((contact) => contact.flip())
+    return contacts
+  } else if (shapeA instanceof Ellipse && shapeB instanceof Triangle) {
+    return ellipseTriangleContacts(shapeA, shapeB, transform, transformInv)
+  } else if (shapeB instanceof Ellipse && shapeA instanceof Triangle) {
+    const contacts = ellipseTriangleContacts(shapeB, shapeA, transformInv, transform)
+    if (contacts) contacts.forEach((contact) => contact.flip())
+    return contacts
   }
 
   return undefined

@@ -1,7 +1,8 @@
 import { Affine2 } from 'hisabati'
-import { Circle } from '../../../shapes'
+import { Circle, Ellipse } from '../../../shapes'
 import  { type Shape2 } from '../../../shapes'
 import { getCircleClosestPoint } from './circle.js'
+import { ellipseCircleClosestPoint, ellipseEllipseClosestPoint } from './ellipse.js'
 import type { ClosestPoint2D } from '../../../core'
 
 export function getShape2ClosestPoints(
@@ -17,6 +18,20 @@ export function getShape2ClosestPoints(
   
   if(shapeA instanceof Circle && shapeB instanceof Circle) {
     return [getCircleClosestPoint(shapeA, shapeB, transform)]
+  }
+
+  if (shapeA instanceof Ellipse && shapeB instanceof Ellipse) {
+    return [ellipseEllipseClosestPoint(shapeA, shapeB, transform)]
+  }
+
+  if (shapeA instanceof Ellipse && shapeB instanceof Circle) {
+    return [ellipseCircleClosestPoint(shapeA, shapeB, transform)]
+  }
+
+  if (shapeA instanceof Circle && shapeB instanceof Ellipse) {
+    const closest = ellipseCircleClosestPoint(shapeB, shapeA, Affine2.invert(transform, new Affine2()))
+    closest.flip()
+    return [closest]
   }
 
   return undefined
