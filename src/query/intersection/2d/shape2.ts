@@ -1,4 +1,4 @@
-import { Affine2, Vector2 } from 'hisabati'
+import { Affine2 } from 'hisabati'
 import { Intersection2D } from '../../../core'
 import { Circle, Capsule, Ellipse, Line2, Rectangle, ConvexPolygon, Triangle, type Shape2 } from '../../../shapes'
 import {
@@ -65,159 +65,90 @@ export function getShape2Intersections(
   } else if (shapeA instanceof Line2 && shapeB instanceof Circle) {
     return lineCircleIntersection(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Circle && shapeB instanceof Line2) {
-    return transformIntersections(
-      lineCircleIntersection(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return lineCircleIntersection(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Line2 && shapeB instanceof Line2) {
     return linesIntersection(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Line2 && shapeB instanceof Rectangle) {
     return lineRectangleIntersection(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Rectangle && shapeB instanceof Line2) {
-    return transformIntersections(
-      lineRectangleIntersection(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return lineRectangleIntersection(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Line2 && shapeB instanceof Triangle) {
     return lineTriangleIntersection(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Triangle && shapeB instanceof Line2) {
-    return transformIntersections(
-      lineTriangleIntersection(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return lineTriangleIntersection(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Line2 && shapeB instanceof Capsule) {
     return lineCapsuleIntersection(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Capsule && shapeB instanceof Line2) {
-    return transformIntersections(
-      lineCapsuleIntersection(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return lineCapsuleIntersection(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Line2 && shapeB instanceof ConvexPolygon) {
     return lineConvexPolygonIntersection(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof ConvexPolygon && shapeB instanceof Line2) {
-    return transformIntersections(
-      lineConvexPolygonIntersection(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return lineConvexPolygonIntersection(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Triangle && shapeB instanceof Rectangle) {
     return triangleRectangleIntersections(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Rectangle && shapeB instanceof Triangle) {
-    return transformIntersections(
-      triangleRectangleIntersections(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return triangleRectangleIntersections(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof ConvexPolygon && shapeB instanceof Triangle) {
     return polygonTriangleIntersections(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Triangle && shapeB instanceof ConvexPolygon) {
-    return transformIntersections(
-      polygonTriangleIntersections(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return polygonTriangleIntersections(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof ConvexPolygon && shapeB instanceof Rectangle) {
     return polygonRectangleIntersections(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Rectangle && shapeB instanceof ConvexPolygon) {
-    return transformIntersections(
-      polygonRectangleIntersections(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return polygonRectangleIntersections(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Circle && shapeB instanceof Triangle) {
     return circleTriangleIntersections(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Triangle && shapeB instanceof Circle) {
-    return transformIntersections(
-      circleTriangleIntersections(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return circleTriangleIntersections(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Circle && shapeB instanceof Rectangle) {
     return circleRectangleIntersections(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Rectangle && shapeB instanceof Circle) {
-    return transformIntersections(
-      circleRectangleIntersections(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return circleRectangleIntersections(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Circle && shapeB instanceof ConvexPolygon) {
     return circlePolygonIntersection(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof ConvexPolygon && shapeB instanceof Circle) {
-    return transformIntersections(
-      circlePolygonIntersection(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return circlePolygonIntersection(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Capsule && shapeB instanceof Circle) {
     return capsuleCircleIntersection(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Circle && shapeB instanceof Capsule) {
-    return transformIntersections(
-      capsuleCircleIntersection(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return capsuleCircleIntersection(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Capsule && shapeB instanceof Rectangle) {
     return capsuleRectangleIntersection(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Rectangle && shapeB instanceof Capsule) {
-    return transformIntersections(
-      capsuleRectangleIntersection(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return capsuleRectangleIntersection(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Capsule && shapeB instanceof Triangle) {
     return capsuleTriangleIntersection(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof Triangle && shapeB instanceof Capsule) {
-    return transformIntersections(
-      capsuleTriangleIntersection(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return capsuleTriangleIntersection(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Capsule && shapeB instanceof ConvexPolygon) {
     return capsuleConvexPolygonIntersection(shapeA, shapeB, transform, tolerance)
   } else if (shapeA instanceof ConvexPolygon && shapeB instanceof Capsule) {
-    return transformIntersections(
-      capsuleConvexPolygonIntersection(shapeB, shapeA, transformInv, tolerance),
-      transform
-    )
+    return capsuleConvexPolygonIntersection(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Ellipse && shapeB instanceof Circle) {
     return ellipseCircleIntersections(shapeA, shapeB, transform, tolerance)
   } else if (shapeB instanceof Ellipse && shapeA instanceof Circle) {
-    return transformIntersections(ellipseCircleIntersections(shapeB, shapeA, transformInv, tolerance), transform)
+    return ellipseCircleIntersections(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Ellipse && shapeB instanceof Capsule) {
     return ellipseCapsuleIntersections(shapeA, shapeB, transform, tolerance)
   } else if (shapeB instanceof Ellipse && shapeA instanceof Capsule) {
-    return transformIntersections(ellipseCapsuleIntersections(shapeB, shapeA, transformInv, tolerance), transform)
+    return ellipseCapsuleIntersections(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Ellipse && shapeB instanceof Line2) {
     return ellipseLineIntersections(shapeA, shapeB, transform, tolerance)
   } else if (shapeB instanceof Ellipse && shapeA instanceof Line2) {
-    return transformIntersections(ellipseLineIntersections(shapeB, shapeA, transformInv, tolerance), transform)
+    return ellipseLineIntersections(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Ellipse && shapeB instanceof Rectangle) {
     return ellipseRectangleIntersections(shapeA, shapeB, transform, tolerance)
   } else if (shapeB instanceof Ellipse && shapeA instanceof Rectangle) {
-    return transformIntersections(ellipseRectangleIntersections(shapeB, shapeA, transformInv, tolerance), transform)
+    return ellipseRectangleIntersections(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Ellipse && shapeB instanceof ConvexPolygon) {
     return ellipsePolygonIntersections(shapeA, shapeB, transform, tolerance)
   } else if (shapeB instanceof Ellipse && shapeA instanceof ConvexPolygon) {
-    return transformIntersections(ellipsePolygonIntersections(shapeB, shapeA, transformInv, tolerance), transform)
+    return ellipsePolygonIntersections(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   } else if (shapeA instanceof Ellipse && shapeB instanceof Triangle) {
     return ellipseTriangleIntersections(shapeA, shapeB, transform, tolerance)
   } else if (shapeB instanceof Ellipse && shapeA instanceof Triangle) {
-    return transformIntersections(ellipseTriangleIntersections(shapeB, shapeA, transformInv, tolerance), transform)
+    return ellipseTriangleIntersections(shapeB, shapeA, transformInv, tolerance)?.transform(transform)
   }
 
   return undefined
-}
-
-function transformIntersections(
-  intersection: Intersection2D | undefined,
-  transform: Affine2
-): Intersection2D | undefined {
-  if (!intersection) {
-    return undefined
-  }
-
-  for (const point of intersection.points) {
-    if (point instanceof Vector2) {
-      Affine2.transform(transform, point, point)
-    } else {
-      Affine2.transform(transform, point.start, point.start)
-      Affine2.transform(transform, point.end, point.end)
-    }
-  }
-
-  for (const normal of intersection.normals) {
-    Affine2.transformWithoutTranslation(transform, normal, normal)
-  }
-
-  return intersection
 }

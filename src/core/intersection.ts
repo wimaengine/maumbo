@@ -25,7 +25,7 @@ export class Intersection2D {
     )
   }
 
-  transform(transform: Affine2) {
+  transform(transform: Affine2): this {
     this.points.forEach(e => {
       if (e instanceof Vector2) {
         Affine2.transform(transform, e, e)
@@ -37,5 +37,7 @@ export class Intersection2D {
     this.normals.forEach(e => {
       Affine2.transformWithoutTranslation(transform, e, e)
     })
+
+    return this
   }
 }
