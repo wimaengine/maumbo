@@ -4,6 +4,7 @@ import { withBase } from "./url";
 const maumboVersion = packageJson["version"].replace(/^[^\d]*/, "");
 const hisabatiVersion = packageJson.dependencies["hisabati"].replace(/^[^\d]*/, "");
 const marangiVersion = packageJson.devDependencies["marangi"].replace(/^[^\d]*/, "");
+const datGuiVersion = packageJson.devDependencies["dat.gui"].replace(/^[^\d]*/, "");
 
 export interface ExampleImportMap {
   imports: Record<string, string>;
@@ -22,6 +23,9 @@ export function createExampleImportMap(isProd: boolean): ExampleImportMap {
   const maumboUrl = isProd
     ? `https://cdn.jsdelivr.net/npm/maumbo@${maumboVersion}/dist/index.module.js`
     : "/src/index.ts";
+  const datGuiUrl = isProd
+    ? `https://cdn.jsdelivr.net/npm/dat.gui@${datGuiVersion}/build/dat.gui.module.js`
+    : "/node_modules/dat.gui/build/dat.gui.module.js";
 
   return {
     imports: {
@@ -30,6 +34,7 @@ export function createExampleImportMap(isProd: boolean): ExampleImportMap {
       hisabati: hisabatiUrl,
       canvas2d: canvas2dUrl,
       "@examples/utils": canvas2dUrl,
+      "dat.gui": datGuiUrl,
     },
   };
 }
