@@ -11,9 +11,9 @@ export function GJK2d(
   shapeB: SupportMapped2d,
   transform: Affine2,
   invTransform: Affine2,
-  position: Vector2
+  startDirection: Vector2 = Vector2.X
 ): SupportPoint<Vector2>[] | undefined {
-  let direction = position.magnitudeSquared() === 0 ? Vector2.X.clone() : position.clone()
+  let direction = startDirection.clone()
   const simplex = [support(shapeA, shapeB, transform, invTransform, direction)]
 
   direction = simplex[0].point.clone().reverse()

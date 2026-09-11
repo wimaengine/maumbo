@@ -16,7 +16,10 @@ export function gjkEPAContact2d(
   invTransform: Affine2
 ): Contact2D[] | undefined {
   const position = new Vector2(transform.x, transform.y)
-  const simplex = GJK2d(shapeA, shapeB, transform, invTransform, position)
+  const startDirection = position.magnitudeSquared() === 0
+    ? Vector2.X.clone()
+    : position
+  const simplex = GJK2d(shapeA, shapeB, transform, invTransform, startDirection)
   if (!simplex) return undefined
 
   const epa = EPA2d(simplex, shapeA, shapeB, transform, invTransform, position)
