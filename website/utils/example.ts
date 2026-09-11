@@ -1,5 +1,4 @@
 import packageJson from "../../package.json";
-import { withBase } from "./url";
 
 const maumboVersion = packageJson["version"].replace(/^[^\d]*/, "");
 const hisabatiVersion = packageJson.dependencies["hisabati"].replace(/^[^\d]*/, "");
@@ -17,9 +16,6 @@ export function createExampleImportMap(isProd: boolean): ExampleImportMap {
   const marangiUrl = isProd
     ? `https://cdn.jsdelivr.net/npm/marangi@${marangiVersion}/dist/index.module.js`
     : "/node_modules/marangi/dist/index.module.js";
-  const canvas2dUrl = isProd
-    ? withBase("/vendor/canvas2d.js")
-    : withBase("/website/vendor/canvas2d.js");
   const maumboUrl = isProd
     ? `https://cdn.jsdelivr.net/npm/maumbo@${maumboVersion}/dist/index.module.js`
     : "/src/index.ts";
@@ -32,8 +28,6 @@ export function createExampleImportMap(isProd: boolean): ExampleImportMap {
       marangi: marangiUrl,
       maumbo: maumboUrl,
       hisabati: hisabatiUrl,
-      canvas2d: canvas2dUrl,
-      "@examples/utils": canvas2dUrl,
       "dat.gui": datGuiUrl,
     },
   };

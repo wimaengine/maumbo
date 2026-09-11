@@ -7,7 +7,7 @@ import {
   Circle,
   getShape2ClosestPoints
 } from 'maumbo'
-import { Canvas2D, Gizmo2D } from '@examples/utils'
+import { Canvas2D, Gizmo2D } from 'maumbo'
 import { Color } from 'marangi'
 
 const canvas2d = new Canvas2D()

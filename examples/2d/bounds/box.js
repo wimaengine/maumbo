@@ -10,7 +10,7 @@ import {
 import {
   Canvas2D,
   Gizmo2D
-} from '@examples/utils'
+} from 'maumbo'
 import { Affine2, Rotary, Vector2 } from 'hisabati'
 import { Color } from 'marangi'
 

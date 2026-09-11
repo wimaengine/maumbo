@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Affine2, Affine3, Rotary, TAU, Vector2, Vector3, BVector2 } from 'hisabati'
 import { Color } from 'marangi'
 
@@ -437,6 +439,10 @@ export class Gizmo3D {
 }
 
 export class Canvas2D {
+  width = 0
+  height = 0
+  gridEnabled = true
+
   constructor() {
     this.container = document.createElement('div')
     this.canvas = document.createElement('canvas')

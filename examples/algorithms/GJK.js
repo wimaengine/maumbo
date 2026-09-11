@@ -1,6 +1,6 @@
 import { Affine2, Rotary, TAU, Vector2 } from 'hisabati'
 import { Capsule, Circle, ConvexPolygon, Ellipse, GJK2d, Line2, Rectangle, Triangle } from 'maumbo'
-import { Canvas2D, Gizmo2D } from '@examples/utils'
+import { Canvas2D, Gizmo2D } from 'maumbo'
 import { Color } from 'marangi'
 import { GUI } from 'dat.gui'
 

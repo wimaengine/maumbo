@@ -11,7 +11,7 @@ import {
   Canvas2D,
   drawIntersections,
   Gizmo2D
-} from '@examples/utils'
+} from 'maumbo'
 import { Vector2, Affine2, Rotary } from 'hisabati'
 import { Color } from 'marangi'
 

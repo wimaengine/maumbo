@@ -15,7 +15,6 @@ export default defineConfig({
         "Maumbo": path.resolve("./src"),
         // Allow Vite to bundle examples in dev without relying on an import map.
         "maumbo": path.resolve("./src/index.ts"),
-        "@examples/utils": path.resolve("./website/vendor/canvas2d.js"),
         "@configs": path.resolve("./website/config"),
         "@layouts": path.resolve("./website/layouts"),
         "@components": path.resolve("./website/components"),
