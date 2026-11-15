@@ -1,31 +1,16 @@
 import { defineConfig } from "astro/config";
-import path from "node:path";
-import remarkGfm from "remark-gfm";
-import remarkGithubBlockquoteAlert from "remark-github-blockquote-alert";
-import remarkLinkBase from "./website/plugins/remark-link-base.js";
+import { website } from "wima-docs-website-template";
 
 export default defineConfig({
-  output:'static',
-  srcDir: "./website",
+  output: "static",
   publicDir: "./assets",
   outDir: "./dist/website",
-  vite: {
-    resolve: {
-      alias: {
-        "Maumbo": path.resolve("./src"),
-        // Allow Vite to bundle examples in dev without relying on an import map.
-        "maumbo": path.resolve("./src/index.ts"),
-        "@configs": path.resolve("./website/config"),
-        "@layouts": path.resolve("./website/layouts"),
-        "@components": path.resolve("./website/components"),
-      }
-    }
-  },
-  markdown: {
-    remarkPlugins: [
-      remarkGfm,
-      remarkGithubBlockquoteAlert,
-      remarkLinkBase,
-    ],
-  },
+  integrations: [
+    website({
+      guideContentDir: "content/guide",
+      examplesContentDir: "examples",
+      apiSourceDir: "src",
+      introContentPath: "README.md"
+    })
+  ]
 });

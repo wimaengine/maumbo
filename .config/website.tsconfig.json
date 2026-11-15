@@ -1,26 +1,14 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [
-    "../website/**/*",
+    "../src/content.config.js",
     "../astro.config.mjs",
     ".astro/types.d.ts"
   ],
   "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
     "baseUrl": "..",
-    "paths": {
-      "@configs": [
-        "./website/config/index.ts"
-      ],
-      "@configs/*": [
-        "./website/config/*"
-      ],
-      "@layouts/*": [
-        "./website/layouts/*"
-      ],
-      "@components/*": [
-        "./website/components/*"
-      ]
-    },
     "types": [
       "astro/client",
       "node"
